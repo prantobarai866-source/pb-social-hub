@@ -1,894 +1,596 @@
-<!doctype html>
-<html lang="bn"><head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260918-05-13efa67","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YACgEZulLoA,0","Arial Narrow":"YAGyDvJ_4Ts,0","Arial Rounded MT Bold":"YAFcfoaHu-s,0","Arial":"YAGyDvJ_4Ts,0","Avenir Next":"YAFcfmNq6UY,0","Baloo 2":"YADK30bC6HQ,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Broken Glyph":"YADZ-exUkv0,0","Canva Sans":"YAFdJjTk5UU,1","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAFcfvtOAUY,1","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","Courier Prime":"YAD1aFjegN8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAFdJpU7Kkk,0","Georgia":"YAGzXkO0pEM,0","Ghost Mono":"YAHQutsX00Q,0","Hanken Grotesk":"YAFcfhwp99E,0","Helvetica Neue":"YAFcf6CtJfI,0","Helvetica":"YAFcf6CtJfI,0","IBM Plex Mono":"YAFdJkmvhGI,0","Impact":"YAFcfnjI7Vk,0","Instrument Serif":"YAHFeOnZNEk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YADK3zbC6RM,0","JetBrains Mono":"YAFdJksXcAk,0","Josefin Sans":"YAFdJjvw9Ps,0","Lato":"YAFdJuFCnaw,0","Libre Baskerville":"YACgEUFdPdA,0","Lobster":"YAD8SnSjSFI,0","Lora":"YACgEXvxf8Q,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YAFdtQi73Xs,0","Nunito":"YAFdJoNRMmU,1","Oleo Script":"YACgEQQ14jI,0","Oswald":"YACgEQY10lw,0","Pacifico":"YADLjORQ1u4,0","Phantom Sans":"YAFdJvgJ5TU,0","Playfair Display":"YAFdJhem5V8,1","Plus Jakarta Sans":"YAGvf3_u0_Q,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YAFdJpYtCxE,1","Raleway":"YAFdJhmxbVQ,1","Roboto Slab":"YAFdJswIKAg,0","Rockwell":"YAFcfyVZnN0,0","Rye":"YACgEdQP21k,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Source Serif 4":"YACgEfdj394,0","Space Grotesk":"YADZ-dYEmhg,0","Space Mono":"YADW1-vpsoc,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Trebuchet MS":"YAFcfrglpVA,0","UV Display":"YAEdVfSSpYo,0","UV Sans":"YAFdJvgJ5TU,0","Ubuntu":"YACgERDU--Q,0","Verdana":"YAGzXTctYtQ,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YAD1aFjegN8,0","ui-sans-serif":"YACkoD1yZN0,0"}}');</script><script src="/_sdk/83d6dfdadcd4750a.telemetry_sdk.js" integrity="sha512-XS4Dvzp6vbagZS9vFErihvr8aO3S0tH78KWUefn06fmL4WYqryBtZj/IOLITYj7dFA4gPVvPg1W/JB1DK3uLNQ=="></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Candy Car Race Pro</title>
-  <style>
-    :root {
-      --cream: #fff7f4;
-      --glass: rgba(20, 12, 28, .72);
-      --pink: #ff4eae;
-      --cyan: #38f4dd;
-      --gold: #ffe178;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
 
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      width: 100%;
-      min-height: calc(100 * min(var(--vh, 1vh), 1vh));
-      overflow: hidden;
-      color: var(--cream);
-      font-family: "DM Sans", sans-serif;
-      touch-action: none;
-      user-select: none;
-    }
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
-    button { font: inherit; -webkit-tap-highlight-color: transparent; }
+  <meta
+    name="description"
+    content="60 SECOND RUSH — Think Fast. Tap Faster. A fast-paced collection of mini challenges."
+  />
 
-    .game-page {
-      width: 100%;
-      min-height: calc(100 * min(var(--vh, 1vh), 1vh));
-      display: grid;
-      place-items: center;
-      padding: clamp(8px, 1.8vw, 22px);
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 20% 8%, rgba(255, 232, 166, .32), transparent 18%),
-        radial-gradient(circle at 83% 86%, rgba(22, 245, 219, .14), transparent 31%),
-        linear-gradient(145deg, #251128, #090710);
-    }
+  <meta name="theme-color" content="#111827" />
 
-    .game-stage {
-      position: relative;
-      width: min(100%, 1040px);
-      height: min(calc(100 * min(var(--vh, 1vh), 1vh) - 18px), 790px);
-      min-height: 440px;
-      overflow: hidden;
-      border: 3px solid rgba(255,255,255,.48);
-      border-radius: 30px;
-      background: #231221;
-      box-shadow: 0 30px 80px rgba(0,0,0,.58), 0 0 0 4px rgba(255,84,176,.14), inset 0 0 50px rgba(255,255,255,.08);
-    }
+  <title>60 SECOND RUSH — Think Fast. Tap Faster.</title>
 
-    canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-    .hud {
-      position: absolute;
-      z-index: 3;
-      inset: 0;
-      padding: clamp(12px, 2.5vw, 22px);
-      pointer-events: none;
-    }
+<body>
+  <div class="app-shell">
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="topbar">
+      <button
+        id="homeButton"
+        class="icon-button"
+        type="button"
+        aria-label="Return to home"
+      >
+        <span aria-hidden="true">⌂</span>
+      </button>
 
-    .hud-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-    .hud-stack { display: grid; gap: 8px; }
-    .hud-stack.right { justify-items: end; }
-
-    .hud-panel {
-      min-width: 136px;
-      padding: 9px 14px;
-      border: 1px solid rgba(255,255,255,.48);
-      border-radius: 15px;
-      background: linear-gradient(135deg, rgba(45,21,51,.84), rgba(13,28,43,.67));
-      box-shadow: 0 7px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.24);
-      backdrop-filter: blur(10px);
-      color: #fff;
-      font-size: clamp(11px, 1.9vw, 17px);
-      font-weight: 900;
-      letter-spacing: .055em;
-      line-height: 1;
-      text-shadow: 0 2px 5px rgba(0,0,0,.8);
-      white-space: nowrap;
-    }
-
-    .hud-panel.small {
-      min-width: 0;
-      padding: 7px 11px;
-      color: var(--gold);
-      font-size: clamp(9px, 1.45vw, 13px);
-    }
-
-    .drive-prompt {
-      position: absolute;
-      z-index: 4;
-      top: clamp(88px, 16%, 130px);
-      left: 50%;
-      transform: translateX(-50%);
-      width: max-content;
-      max-width: calc(100% - 34px);
-      padding: 10px 17px;
-      border: 1px solid rgba(255,255,255,.67);
-      border-radius: 999px;
-      box-shadow: 0 9px 25px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.22);
-      font-size: clamp(11px, 1.8vw, 15px);
-      font-weight: 900;
-      letter-spacing: .07em;
-      text-align: center;
-      animation: prompt-float 1.7s ease-in-out infinite;
-    }
-    .drive-prompt.is-hidden { display: none; }
-    @keyframes prompt-float { 50% { transform: translateX(-50%) translateY(-6px); } }
-
-    .controls {
-      position: absolute;
-      z-index: 5;
-      right: clamp(15px, 3vw, 28px);
-      bottom: clamp(15px, 3vw, 28px);
-      display: flex;
-      gap: 12px;
-    }
-
-    .control-button {
-      width: clamp(62px, 11vw, 82px);
-      height: clamp(58px, 10vw, 73px);
-      border: 2px solid rgba(255,255,255,.84);
-      border-radius: 20px;
-      box-shadow: 0 8px 0 rgba(65,15,55,.92), 0 15px 25px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
-      cursor: pointer;
-      text-shadow: 0 2px 3px rgba(0,0,0,.45);
-      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-    }
-
-    .control-button:last-child { box-shadow: 0 8px 0 rgba(11,80,106,.94), 0 15px 25px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35); }
-    .control-button:hover { filter: brightness(1.12); transform: translateY(-2px); }
-    .control-button:active, .control-button.is-pressed { transform: translateY(6px) scale(.97); box-shadow: 0 2px 0 rgba(28,14,37,.9); }
-    .control-button:focus-visible, #restart-btn:focus-visible { outline: 4px solid #fff08a; outline-offset: 4px; }
-
-    .gameover {
-      position: absolute;
-      z-index: 10;
-      inset: 0;
-      display: none;
-      place-items: center;
-      padding: 24px;
-      backdrop-filter: blur(10px);
-    }
-    .gameover.is-visible { display: grid; }
-
-    .gameover-card {
-      width: min(100%, 410px);
-      padding: 32px 28px;
-      border: 1px solid rgba(255,255,255,.72);
-      border-radius: 26px;
-      background: linear-gradient(145deg, rgba(56,20,61,.96), rgba(11,40,55,.96));
-      box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.28);
-      text-align: center;
-      animation: card-in .35s ease-out;
-    }
-    @keyframes card-in { from { transform: translateY(18px) scale(.92); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-    .gameover h1 { margin: 0 0 13px; text-shadow: 0 4px 0 #8f236f, 0 0 18px rgba(255,86,174,.55); letter-spacing: .055em; line-height: 1; }
-    .gameover p { margin: 9px 0; color: #fff; font-size: clamp(15px, 2vw, 18px); font-weight: 800; }
-
-    #restart-btn {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px 20px;
-      border: 2px solid rgba(255,255,255,.88);
-      border-radius: 999px;
-      box-shadow: 0 7px 0 #126a85, 0 15px 24px rgba(0,0,0,.27), inset 0 1px 0 rgba(255,255,255,.3);
-      cursor: pointer;
-      letter-spacing: .06em;
-      transition: transform .12s ease, box-shadow .12s ease;
-    }
-    #restart-btn:active { transform: translateY(5px); box-shadow: 0 2px 0 #126a85; }
-
-    @media (max-width: 520px) {
-      .game-page { padding: 0; }
-      .game-stage { width: 100%; height: calc(100 * min(var(--vh, 1vh), 1vh)); min-height: 420px; border: 0; border-radius: 0; }
-      .hud-panel { min-width: 108px; padding: 8px 9px; }
-      .controls { left: 14px; right: 14px; justify-content: space-between; }
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
-  <script src="/_sdk/8de366929c5f3b48.data_sdk.js" type="text/javascript" integrity="sha512-TyQ8k8cZj66xe/aENmn6RyZpdOFZXbAo5+KBG3PeFM+Q4qMTHU8xAqmq4ADClNfPrstgQYV6OzZHwLTnElzB2g=="></script>
-  <script src="/_sdk/0ddbbee1c66b1212.editing_sdk.js" type="text/javascript" integrity="sha512-HQn5LM1yruQSbY78ATUril6QeOJ9xj7KqO64ltLtb4vBwI5Qv3/tloFFOndBPZTNZoeV5xKzuth5y6FTi9crsg=="></script>
-  <script src="/_sdk/765e1fea0cec97ce.resizing_sdk.js" type="text/javascript" integrity="sha512-IRTJnqww0+HQ5V/LlWEQrlD5SrYHaVvaeVoNe8HYQXoaguzUGheSd9+n9s6WOgaTcEH0g37DuINHZ9aqfzWjlw=="></script>
- </head>
- <body data-template-id="__page-root" style="background: linear-gradient(145deg, rgb(37, 17, 40), rgb(9, 7, 16)); color: rgb(255, 247, 244);">
-  <main class="game-page">
-   <section class="game-stage" aria-label="Candy town road racing game">
-    <canvas id="game-canvas" aria-label="Candy car racing game. Use left and right controls or arrow keys to drive."></canvas>
-    <div class="hud" aria-live="polite">
-     <div class="hud-top">
-      <div class="hud-stack">
-       <div class="hud-panel" id="score-display">
-        SCORE: 0 🍬
-       </div>
-       <div class="hud-panel small" id="speed-display">
-        SPEED: 1 · LEVEL 1
-       </div>
+      <div class="topbar-title" aria-label="60 Second Rush">
+        <span>60 SECOND</span>
+        <strong>RUSH</strong>
       </div>
-      <div class="hud-stack right">
-       <div class="hud-panel" id="lives-display">
-        LIVES: ♥ ♥ ♥
-       </div>
-       <div class="hud-panel" id="best-display">
-        BEST: 0
-       </div>
-      </div>
-     </div>
-    </div>
-    <div id="drive-prompt" data-template-id="tap-to-drive-prompt" class="drive-prompt canva-banner" style="background: rgba(28, 10, 34, 0.72); color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 15px;">TAP TO DRIVE · ← → OR A / D</div>
-    <div class="controls" aria-label="Driving controls"><button id="left-control" data-template-id="left-control" class="control-button canva-button" type="button" aria-label="Move car left" style="background: linear-gradient(145deg, rgb(255, 112, 184), rgb(168, 45, 146)); color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 32px;">←</button> <button id="right-control" data-template-id="right-control" class="control-button canva-button" type="button" aria-label="Move car right" style="background: linear-gradient(145deg, rgb(65, 242, 223), rgb(22, 141, 190)); color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 32px;">→</button>
-    </div>
-    <div id="gameover-overlay" data-template-id="gameover-overlay" class="gameover canva-panel" aria-hidden="true" style="background: rgba(26, 10, 34, 0.46);">
-     <section class="gameover-card" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
-      <h1 id="gameover-title" data-template-id="gameover-title" class="canva-text" style="color: rgb(255, 243, 167); font-weight: 900; font-style: normal; font-size: 32px;">RACE OVER!</h1>
-      <p id="final-score">SCORE: 0</p>
-      <p id="final-best">BEST: 0</p>
-      <p data-template-id="gameover-message" class="canva-text" style="color: rgb(255, 255, 255); font-weight: 700; font-style: normal; font-size: 16px;">Your candy-town drive is complete. Ready for another run?</p><button id="restart-btn" data-template-id="restart-button" class="canva-button" type="button" style="background: linear-gradient(135deg, rgb(44, 241, 217), rgb(17, 137, 199)); color: rgb(255, 255, 255); font-weight: 900; font-style: normal; font-size: 19px;">PLAY AGAIN</button>
-     </section>
-    </div>
-   </section>
-  </main>
-  <script>
-    (() => {
-      "use strict";
-
-      const canvas = document.getElementById("game-canvas");
-      const stage = document.querySelector(".game-stage");
-      const ctx = canvas && canvas.getContext("2d");
-      const scoreDisplay = document.getElementById("score-display");
-      const livesDisplay = document.getElementById("lives-display");
-      const bestDisplay = document.getElementById("best-display");
-      const speedDisplay = document.getElementById("speed-display");
-      const promptDisplay = document.getElementById("drive-prompt");
-      const overlay = document.getElementById("gameover-overlay");
-      const finalScore = document.getElementById("final-score");
-      const finalBest = document.getElementById("final-best");
-      const restartButton = document.getElementById("restart-btn");
-      const leftButton = document.getElementById("left-control");
-      const rightButton = document.getElementById("right-control");
-
-      if (!canvas || !stage || !ctx) return;
-
-      let width = 0, height = 0, dpr = 1, rafId = 0, lastFrame = 0;
-      let gameStarted = false, gameOver = false, paused = false;
-      let score = 0, bestScore = 0, lives = 3, level = 1, speed = .7;
-      let targetLane = 1, carLane = 1, roadFlow = 0, spawnClock = 0;
-      let shake = 0, flash = 0, invulnerable = 0, carBounce = 0;
-      let entities = [], particles = [], popups = [];
-
-      const laneCount = 3;
-      const candyColors = ["#ff5cab", "#ffd45d", "#3ff5db", "#9d7dff", "#ff8e50"];
-      const people = Array.from({ length: 34 }, (_, i) => ({
-        seed: i * 91.27,
-        side: i % 2 ? 1 : -1,
-        outfit: ["#fb5aa6", "#2dd8cb", "#ffd05b", "#7456d9", "#ff7b4f"][i % 5],
-        skin: ["#f6c7a4", "#a96e4c", "#76452e", "#db9b73"][i % 4],
-        wave: i % 5 === 0
-      }));
-
-      try { bestScore = Number(localStorage.getItem("candy-road-best") || 0); } catch (_) {}
-
-      function resizeCanvas() {
-        const rect = stage.getBoundingClientRect();
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        width = Math.max(320, rect.width);
-        height = Math.max(420, rect.height);
-        canvas.width = Math.round(width * dpr);
-        canvas.height = Math.round(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      function horizon() { return height * .205; }
-      function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-      function depthY(z) { return horizon() + Math.pow(clamp(z, 0, 1), 1.56) * (height - horizon()); }
-
-      function roadAt(y) {
-        const h = horizon();
-        const t = clamp((y - h) / (height - h), 0, 1);
-        const curve = Math.pow(t, 1.58);
-        const center = width * .5 + Math.sin(roadFlow * .00108) * curve * width * .035;
-        const half = width * (.067 + curve * .535);
-        return { t, center, left: center - half, right: center + half, half };
-      }
-
-      function laneX(lane, y) {
-        const road = roadAt(y);
-        return road.left + road.half * ((lane + .5) / laneCount * 2);
-      }
-
-      function updateHud() {
-        if (scoreDisplay) scoreDisplay.textContent = `SCORE: ${score.toLocaleString("en-US")} 🍬`;
-        if (bestDisplay) bestDisplay.textContent = `BEST: ${bestScore.toLocaleString("en-US")}`;
-        if (speedDisplay) speedDisplay.textContent = `SPEED: ${Math.round(speed * 100)} · LEVEL ${level}`;
-        if (livesDisplay) livesDisplay.textContent = `LIVES: ${lives ? "♥ ".repeat(lives).trim() : "—"}`;
-      }
-
-      function saveBest() {
-        if (score <= bestScore) return;
-        bestScore = score;
-        try { localStorage.setItem("candy-road-best", String(bestScore)); } catch (_) {}
-      }
-
-      function startGame() {
-        if (gameStarted || gameOver) return;
-        gameStarted = true;
-        if (promptDisplay) promptDisplay.classList.add("is-hidden");
-      }
-
-      function moveLane(direction) {
-        if (gameOver) return;
-        startGame();
-        targetLane = clamp(targetLane + direction, 0, laneCount - 1);
-      }
-
-      function addParticles(x, y, color, amount, force) {
-        for (let i = 0; i < amount; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const velocity = (40 + Math.random() * 175) * force;
-          particles.push({
-            x, y, color,
-            vx: Math.cos(angle) * velocity,
-            vy: Math.sin(angle) * velocity - 45,
-            size: 1.5 + Math.random() * 5,
-            life: .35 + Math.random() * .55,
-            max: .9
-          });
-        }
-      }
-
-      function addPopup(x, y, text, color) {
-        popups.push({ x, y, text, color, life: .95, max: .95 });
-      }
-
-      function spawnEntity() {
-        const roll = Math.random();
-        const kind = roll < .5 ? "candy" : roll < .78 ? "obstacle" : "heart";
-        entities.push({
-          lane: Math.floor(Math.random() * laneCount),
-          z: .025,
-          kind,
-          color: candyColors[Math.floor(Math.random() * candyColors.length)],
-          rotation: Math.random() * Math.PI * 2,
-          hit: false
-        });
-      }
-
-      function collectCandy(entity, x, y) {
-        entity.hit = true;
-        const points = 20 + level * 3;
-        score += points;
-        saveBest();
-        addParticles(x, y, entity.color, 22, 1.15);
-        addPopup(x, y, `+${points}`, "#fff2a5");
-      }
-
-      function collectHeart(entity, x, y) {
-        entity.hit = true;
-        if (lives < 3) lives += 1;
-        addParticles(x, y, "#ff629f", 28, 1.4);
-        addPopup(x, y, "LIFE +1", "#ffe1ef");
-      }
-
-      function collide(entity, x, y) {
-        if (invulnerable > 0) return;
-        entity.hit = true;
-        lives = Math.max(0, lives - 1);
-        invulnerable = 1.05;
-        shake = 19;
-        flash = .72;
-        addParticles(x, y, "#ff503f", 34, 1.55);
-        addPopup(x, y, "CRASH!", "#fff3dd");
-        if (lives === 0) triggerGameOver();
-      }
-
-      function triggerGameOver() {
-        gameOver = true;
-        paused = true;
-        saveBest();
-        updateHud();
-        if (finalScore) finalScore.textContent = `SCORE: ${score.toLocaleString("en-US")}`;
-        if (finalBest) finalBest.textContent = `BEST: ${bestScore.toLocaleString("en-US")}`;
-        if (overlay) {
-          overlay.classList.add("is-visible");
-          overlay.setAttribute("aria-hidden", "false");
-        }
-      }
-
-      function restartGame() {
-        score = 0; lives = 3; level = 1; speed = .7;
-        targetLane = 1; carLane = 1; roadFlow = 0; spawnClock = 0;
-        shake = 0; flash = 0; invulnerable = 0; carBounce = 0;
-        entities = []; particles = []; popups = [];
-        gameStarted = false; gameOver = false; paused = false;
-        if (overlay) {
-          overlay.classList.remove("is-visible");
-          overlay.setAttribute("aria-hidden", "true");
-        }
-        if (promptDisplay) promptDisplay.classList.remove("is-hidden");
-        updateHud();
-      }
-      window.restartGame = restartGame;
-
-      function drawSky() {
-        const sky = ctx.createLinearGradient(0, 0, 0, height);
-        sky.addColorStop(0, "#6bc5e4");
-        sky.addColorStop(.33, "#d799d1");
-        sky.addColorStop(.62, "#f7b6a7");
-        sky.addColorStop(1, "#614052");
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, width, height);
-
-        const sunX = width * .18, sunY = height * .13;
-        const glow = ctx.createRadialGradient(sunX, sunY, 4, sunX, sunY, height * .2);
-        glow.addColorStop(0, "rgba(255,255,211,.98)");
-        glow.addColorStop(.22, "rgba(255,218,145,.65)");
-        glow.addColorStop(1, "rgba(255,180,160,0)");
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, width, height * .48);
-        ctx.fillStyle = "#fff3a8";
-        ctx.beginPath(); ctx.arc(sunX, sunY, height * .036, 0, Math.PI * 2); ctx.fill();
-
-        for (let i = 0; i < 12; i++) {
-          const x = ((i * 147 - roadFlow * (.018 + (i % 3) * .008)) % (width + 170)) - 70;
-          const y = height * (.045 + (i % 4) * .045);
-          ctx.fillStyle = "rgba(255,255,255,.54)";
-          ctx.beginPath();
-          ctx.ellipse(x, y, 27, 12, 0, 0, Math.PI * 2);
-          ctx.ellipse(x + 25, y - 5, 24, 17, 0, 0, Math.PI * 2);
-          ctx.ellipse(x + 51, y + 2, 32, 14, 0, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        const haze = ctx.createLinearGradient(0, horizon() - 12, 0, horizon() + 100);
-        haze.addColorStop(0, "rgba(255,232,246,.58)");
-        haze.addColorStop(1, "rgba(255,232,246,0)");
-        ctx.fillStyle = haze;
-        ctx.fillRect(0, horizon() - 20, width, 120);
-      }
-
-      function drawDistantTown() {
-        const h = horizon();
-        ctx.fillStyle = "#84b89c";
-        ctx.beginPath();
-        ctx.moveTo(0, h + 10);
-        ctx.quadraticCurveTo(width * .17, h - 27, width * .35, h + 17);
-        ctx.quadraticCurveTo(width * .67, h - 30, width, h + 13);
-        ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.closePath(); ctx.fill();
-
-        for (let i = 0; i < 18; i++) {
-          const side = i % 2 ? 1 : -1;
-          const x = side < 0 ? width * (.03 + (i % 5) * .06) : width * (.68 + (i % 5) * .065);
-          const y = h - 4 - (i % 3) * 7;
-          ctx.fillStyle = ["#ff83be", "#5ae6d3", "#ffe17d"][i % 3];
-          ctx.fillRect(x, y, 11 + (i % 4) * 4, 12 + (i % 3) * 7);
-          ctx.fillStyle = "rgba(255,255,255,.56)";
-          ctx.fillRect(x + 3, y + 3, 3, 4);
-        }
-      }
-
-      function drawRoad() {
-        const h = horizon(), top = roadAt(h), bottom = roadAt(height);
-        const shoulder = ctx.createLinearGradient(0, h, 0, height);
-        shoulder.addColorStop(0, "#d8a7ba");
-        shoulder.addColorStop(1, "#70405b");
-        ctx.fillStyle = shoulder;
-        ctx.fillRect(0, h, width, height - h);
-
-        const road = ctx.createLinearGradient(0, h, 0, height);
-        road.addColorStop(0, "#6e4155");
-        road.addColorStop(.42, "#2b1b28");
-        road.addColorStop(1, "#100b12");
-        ctx.fillStyle = road;
-        ctx.beginPath();
-        ctx.moveTo(top.left, h); ctx.lineTo(top.right, h);
-        ctx.lineTo(bottom.right, height); ctx.lineTo(bottom.left, height);
-        ctx.closePath(); ctx.fill();
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(top.left, h); ctx.lineTo(top.right, h); ctx.lineTo(bottom.right, height); ctx.lineTo(bottom.left, height); ctx.closePath();
-        ctx.clip();
-
-        for (let i = 0; i < 28; i++) {
-          const z = (i * .048 + roadFlow * .0007) % 1;
-          const y = depthY(z);
-          const r = roadAt(y);
-          ctx.strokeStyle = `rgba(255,205,225,${.025 + z * .065})`;
-          ctx.lineWidth = 1 + z * 2;
-          ctx.beginPath(); ctx.moveTo(r.left, y); ctx.lineTo(r.right, y); ctx.stroke();
-        }
-
-        for (let lane = 1; lane < laneCount; lane++) {
-          for (let i = 0; i < 9; i++) {
-            const z1 = (i * .13 + roadFlow * .00085) % 1;
-            const z2 = Math.min(1, z1 + .058);
-            const y1 = depthY(z1), y2 = depthY(z2);
-            ctx.strokeStyle = "rgba(255,247,238,.9)";
-            ctx.shadowColor = "rgba(255,225,255,.55)";
-            ctx.shadowBlur = 6;
-            ctx.lineWidth = 1 + z1 * 8;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(laneX(lane - .5, y1), y1);
-            ctx.lineTo(laneX(lane - .5, y2), y2);
-            ctx.stroke();
-          }
-        }
-        ctx.restore();
-        ctx.shadowBlur = 0;
-
-        [0, 1].forEach(side => {
-          for (let i = 0; i < 20; i++) {
-            const z = (i * .057 + roadFlow * .00108) % 1;
-            const y = depthY(z), r = roadAt(y);
-            const x = side ? r.right : r.left;
-            const radius = 1.2 + z * 6;
-            ctx.fillStyle = i % 2 ? "#42f4df" : "#ff72b9";
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.shadowBlur = 7 + z * 11;
-            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-          }
-        });
-        ctx.shadowBlur = 0;
-      }
-
-      function drawRoadsideObject(x, y, s, side, type) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.scale(s, s);
-        ctx.globalAlpha = clamp(.38 + s * .44, 0, 1);
-        ctx.fillStyle = "rgba(20,8,19,.28)";
-        ctx.beginPath(); ctx.ellipse(0, 14, 27, 7, 0, 0, Math.PI * 2); ctx.fill();
-
-        if (type === 0) {
-          ctx.strokeStyle = "#754b65"; ctx.lineWidth = 4;
-          ctx.beginPath(); ctx.moveTo(0, 15); ctx.lineTo(0, -30); ctx.stroke();
-          ctx.fillStyle = "#f9df93";
-          ctx.shadowColor = "#ffe88b"; ctx.shadowBlur = 16;
-          ctx.beginPath(); ctx.arc(0, -32, 9, 0, Math.PI * 2); ctx.fill();
-          ctx.shadowBlur = 0;
-        } else if (type === 1) {
-          ctx.fillStyle = "#f4c772";
-          ctx.fillRect(-26, -8, 52, 30);
-          ctx.fillStyle = "#ff6eb2";
-          ctx.beginPath(); ctx.moveTo(-31, -8); ctx.lineTo(0, -31); ctx.lineTo(31, -8); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = "#63e7d6"; ctx.fillRect(-15, 0, 12, 12); ctx.fillRect(5, 0, 12, 12); ctx.fill();
-          ctx.fillStyle = "#fff6d3"; ctx.fillRect(-19, -18, 38, 5); ctx.fill();
-        } else if (type === 2) {
-          ctx.fillStyle = "#9a6647";
-          ctx.fillRect(-20, 3, 40, 6);
-          ctx.fillRect(-15, 9, 4, 14); ctx.fillRect(11, 9, 4, 14);
-          ctx.fillStyle = "#49bf78";
-          ctx.beginPath(); ctx.arc(0, -7, 19, 0, Math.PI * 2); ctx.fill();
-        } else {
-          ctx.strokeStyle = "#e5e8ea"; ctx.lineWidth = 3;
-          ctx.beginPath(); ctx.moveTo(-24, 20); ctx.lineTo(-24, -5); ctx.lineTo(24, -5); ctx.lineTo(24, 20); ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      function drawPedestrian(person, z, time) {
-        const y = depthY(z);
-        const r = roadAt(y);
-        const s = .12 + z * .84;
-        const offset = 24 + z * width * .14;
-        const x = person.side < 0 ? r.left - offset : r.right + offset;
-        const walk = Math.sin(time * .006 + person.seed) * 5;
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.scale(s, s);
-        ctx.globalAlpha = clamp(.38 + z * .68, 0, 1);
-
-        ctx.fillStyle = "rgba(20,10,20,.28)";
-        ctx.beginPath(); ctx.ellipse(0, 20, 13, 4, 0, 0, Math.PI * 2); ctx.fill();
-
-        ctx.strokeStyle = "#243041"; ctx.lineWidth = 6; ctx.lineCap = "round";
-        ctx.beginPath(); ctx.moveTo(-4, 11); ctx.lineTo(-7 + walk * .35, 25); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(4, 11); ctx.lineTo(7 - walk * .35, 25); ctx.stroke();
-
-        ctx.fillStyle = person.outfit;
-        ctx.beginPath(); ctx.roundRect(-10, -9, 20, 23, 6); ctx.fill();
-
-        ctx.strokeStyle = person.skin; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.moveTo(-9, -3); ctx.lineTo(-17, 6 + walk * .2); ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(9, -3);
-        ctx.lineTo(person.wave ? 16 : 15, person.wave ? -14 + walk * .2 : 7 - walk * .2);
-        ctx.stroke();
-
-        ctx.fillStyle = person.skin;
-        ctx.beginPath(); ctx.arc(0, -18, 8, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#51323b";
-        ctx.beginPath(); ctx.arc(0, -21, 8.5, Math.PI, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      }
-
-      function drawRoadside(time) {
-        for (let i = 0; i < 30; i++) {
-          const z = (i * .071 + roadFlow * .00029) % 1;
-          const y = depthY(z);
-          const r = roadAt(y);
-          const side = i % 2 ? 1 : -1;
-          const x = side < 0 ? r.left - (18 + z * width * .13) : r.right + (18 + z * width * .13);
-          drawRoadsideObject(x, y, .15 + z * .9, side, i % 4);
-        }
-
-        people.forEach((person, index) => {
-          const z = (index * .103 + roadFlow * .00022) % 1;
-          if (z > .08) drawPedestrian(person, z, time);
-        });
-      }
-
-      function drawEntity(entity) {
-        const y = depthY(entity.z);
-        const x = laneX(entity.lane, y);
-        const s = .16 + entity.z * 1.27;
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.scale(s, s);
-        ctx.rotate(Math.sin(entity.rotation) * .12);
-
-        ctx.fillStyle = "rgba(0,0,0,.3)";
-        ctx.beginPath(); ctx.ellipse(0, 29, 29, 8, 0, 0, Math.PI * 2); ctx.fill();
-
-        if (entity.kind === "candy") {
-          ctx.shadowColor = entity.color; ctx.shadowBlur = 22;
-          const g = ctx.createRadialGradient(-7, -9, 2, 0, 0, 25);
-          g.addColorStop(0, "#fff9e9"); g.addColorStop(.25, entity.color); g.addColorStop(1, "#9c2b78");
-          ctx.fillStyle = g;
-          ctx.beginPath(); ctx.arc(0, 0, 23, 0, Math.PI * 2); ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = "#fff4ef"; ctx.fillRect(-23, -4, 46, 8);
-        } else if (entity.kind === "heart") {
-          ctx.shadowColor = "#ff5999"; ctx.shadowBlur = 25;
-          ctx.fillStyle = "#ff5f9e";
-          ctx.beginPath();
-          ctx.moveTo(0, 22); ctx.bezierCurveTo(-38, 0, -21, -27, 0, -10);
-          ctx.bezierCurveTo(21, -27, 38, 0, 0, 22); ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = "rgba(255,255,255,.62)";
-          ctx.beginPath(); ctx.ellipse(-8, -7, 6, 4, -.5, 0, Math.PI * 2); ctx.fill();
-        } else {
-          const g = ctx.createLinearGradient(-25, -20, 26, 28);
-          g.addColorStop(0, "#ffdfa0"); g.addColorStop(.32, "#ff754f"); g.addColorStop(1, "#8f263d");
-          ctx.fillStyle = g;
-          ctx.shadowColor = "#ff784d"; ctx.shadowBlur = 13;
-          ctx.beginPath(); ctx.roundRect(-23, -15, 46, 46, 13); ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = "#fff1d4";
-          ctx.beginPath(); ctx.arc(-8, 3, 3, 0, Math.PI * 2); ctx.arc(8, 3, 3, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.restore();
-        return { x, y };
-      }
-
-      function drawCar() {
-        const y = height * .79 + Math.sin(carBounce) * 2;
-        const x = laneX(carLane, y);
-        const s = Math.min(width, height) * .115;
-        const steering = (targetLane - carLane) * -.2;
-
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(steering);
-
-        if (gameStarted && speed > .82) {
-          for (let i = 0; i < 8; i++) {
-            ctx.strokeStyle = `rgba(224,255,255,${.025 + i * .011})`;
-            ctx.lineWidth = 1 + i * .7;
-            ctx.beginPath();
-            ctx.moveTo(-s * (.7 + i * .06), s * (.1 + i * .045));
-            ctx.lineTo(-s * (2.1 + i * .25), s * (.38 + i * .09));
-            ctx.stroke();
-          }
-        }
-
-        const reflection = ctx.createRadialGradient(0, s * .5, 1, 0, s * .5, s * 1.35);
-        reflection.addColorStop(0, "rgba(255,66,150,.33)");
-        reflection.addColorStop(1, "rgba(255,66,150,0)");
-        ctx.fillStyle = reflection;
-        ctx.beginPath(); ctx.ellipse(0, s * .63, s * .92, s * .3, 0, 0, Math.PI * 2); ctx.fill();
-
-        ctx.fillStyle = "rgba(2,2,8,.64)";
-        ctx.beginPath(); ctx.ellipse(0, s * .48, s * .78, s * .22, 0, 0, Math.PI * 2); ctx.fill();
-
-        [-1, 1].forEach(side => {
-          ctx.fillStyle = "#11121b";
-          ctx.beginPath(); ctx.roundRect(side * s * .5 - s * .11, -s * .12, s * .22, s * .63, s * .075); ctx.fill();
-          ctx.fillStyle = "#5c6571";
-          ctx.beginPath(); ctx.arc(side * s * .5, s * .28, s * .105, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = "#151923";
-          ctx.beginPath(); ctx.arc(side * s * .5, s * .28, s * .055, 0, Math.PI * 2); ctx.fill();
-        });
-
-        const body = ctx.createLinearGradient(-s, -s * .6, s, s * .65);
-        body.addColorStop(0, "#ffe6f2");
-        body.addColorStop(.12, "#ff82c4");
-        body.addColorStop(.42, "#e82a81");
-        body.addColorStop(.73, "#9b1d5c");
-        body.addColorStop(1, "#4b1636");
-        ctx.fillStyle = body;
-        ctx.shadowColor = "#ff4da7"; ctx.shadowBlur = 16;
-        ctx.beginPath();
-        ctx.moveTo(-s*.62, s*.32);
-        ctx.lineTo(-s*.48, -s*.34);
-        ctx.quadraticCurveTo(0, -s*.76, s*.48, -s*.34);
-        ctx.lineTo(s*.62, s*.32);
-        ctx.quadraticCurveTo(s*.34, s*.57, 0, s*.58);
-        ctx.quadraticCurveTo(-s*.34, s*.57, -s*.62, s*.32);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        ctx.fillStyle = "rgba(255,255,255,.27)";
-        ctx.beginPath();
-        ctx.moveTo(-s*.42, -s*.3); ctx.quadraticCurveTo(0, -s*.62, s*.15, -s*.47);
-        ctx.lineTo(-s*.05, -s*.16); ctx.lineTo(-s*.34, -s*.08); ctx.closePath(); ctx.fill();
-
-        const glass = ctx.createLinearGradient(-s*.23, -s*.5, s*.2, 0);
-        glass.addColorStop(0, "rgba(224,255,255,.88)");
-        glass.addColorStop(.25, "rgba(75,212,239,.52)");
-        glass.addColorStop(.7, "rgba(18,38,76,.9)");
-        glass.addColorStop(1, "rgba(9,15,38,.96)");
-        ctx.fillStyle = glass;
-        ctx.beginPath();
-        ctx.moveTo(-s*.28, -s*.34); ctx.lineTo(0, -s*.57); ctx.lineTo(s*.28, -s*.34);
-        ctx.lineTo(s*.18, -s*.06); ctx.lineTo(-s*.18, -s*.06); ctx.closePath(); ctx.fill();
-
-        ctx.fillStyle = "#ff85be";
-        ctx.beginPath(); ctx.ellipse(-s*.62, -s*.04, s*.12, s*.06, -.3, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(s*.62, -s*.04, s*.12, s*.06, .3, 0, Math.PI * 2); ctx.fill();
-
-        ctx.fillStyle = "#fff7bd";
-        ctx.shadowColor = "#fff1aa"; ctx.shadowBlur = 15;
-        ctx.beginPath(); ctx.roundRect(-s*.41, -.01*s, s*.15, s*.11, s*.03); ctx.fill();
-        ctx.beginPath(); ctx.roundRect(s*.26, -.01*s, s*.15, s*.11, s*.03); ctx.fill();
-        ctx.shadowBlur = 0;
-
-        ctx.fillStyle = "#37f0dd";
-        ctx.beginPath(); ctx.roundRect(-s*.4, s*.13, s*.15, s*.08, s*.03); ctx.fill();
-        ctx.beginPath(); ctx.roundRect(s*.25, s*.13, s*.15, s*.08, s*.03); ctx.fill();
-
-        ctx.fillStyle = "#ff345d";
-        ctx.shadowColor = "#ff395f"; ctx.shadowBlur = 13;
-        ctx.fillRect(-s*.31, s*.32, s*.14, s*.07);
-        ctx.fillRect(s*.17, s*.32, s*.14, s*.07);
-        ctx.shadowBlur = 0;
-
-        ctx.strokeStyle = "#ffe16c"; ctx.lineWidth = Math.max(2, s*.03);
-        ctx.beginPath(); ctx.moveTo(-s*.17, s*.43); ctx.lineTo(s*.17, s*.43); ctx.stroke();
-        ctx.restore();
-      }
-
-      function updateParticles(delta) {
-        particles.forEach(p => {
-          p.x += p.vx * delta; p.y += p.vy * delta; p.vy += 160 * delta; p.life -= delta;
-          ctx.globalAlpha = Math.max(0, p.life / p.max);
-          ctx.fillStyle = p.color;
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-        });
-        particles = particles.filter(p => p.life > 0);
-        ctx.globalAlpha = 1;
-      }
-
-      function updatePopups(delta) {
-        popups.forEach(p => {
-          p.y -= 48 * delta; p.life -= delta;
-          ctx.globalAlpha = Math.max(0, p.life / p.max);
-          ctx.fillStyle = p.color;
-          ctx.font = "900 20px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(p.text, p.x, p.y);
-        });
-        popups = popups.filter(p => p.life > 0);
-        ctx.globalAlpha = 1;
-      }
-
-      function update(delta, timestamp) {
-        if (paused) return;
-
-        roadFlow += (gameStarted ? speed * 420 : 20) * delta;
-        shake = Math.max(0, shake - delta * 40);
-        flash = Math.max(0, flash - delta * 1.9);
-        invulnerable = Math.max(0, invulnerable - delta);
-        carBounce += delta * (gameStarted ? speed * 8 : 2);
-
-        if (!gameStarted) return;
-
-        speed += (.86 + Math.min(score / 5200, .9) - speed) * Math.min(1, delta * 1.25);
-        level = Math.max(1, Math.floor(score / 210) + 1);
-        carLane += (targetLane - carLane) * Math.min(1, delta * 11);
-
-        spawnClock += delta * 1000;
-        if (spawnClock > Math.max(420, 970 - level * 38)) {
-          spawnEntity();
-          spawnClock = 0;
-        }
-
-        entities.forEach(entity => {
-          entity.z += delta * (.22 + speed * .145);
-          entity.rotation += delta * 3;
-          if (!entity.hit && entity.z > .71 && entity.z < .95 && Math.abs(entity.lane - carLane) < .34) {
-            const y = depthY(entity.z), x = laneX(entity.lane, y);
-            if (entity.kind === "candy") collectCandy(entity, x, y);
-            else if (entity.kind === "heart") collectHeart(entity, x, y);
-            else collide(entity, x, y);
-          }
-        });
-
-        entities = entities.filter(entity => entity.z < 1.12 && !entity.hit);
-        updateHud();
-      }
-
-      function render(delta, timestamp) {
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        if (shake > 0) ctx.translate((Math.random() - .5) * shake, (Math.random() - .5) * shake);
-
-        drawSky();
-        drawDistantTown();
-        drawRoad();
-        drawRoadside(timestamp);
-        entities.forEach(drawEntity);
-        updateParticles(delta);
-        drawCar();
-        updatePopups(delta);
-
-        if (flash > 0) {
-          ctx.fillStyle = `rgba(255,45,55,${flash * .31})`;
-          ctx.fillRect(0, 0, width, height);
-        }
-
-        if (invulnerable > 0 && Math.floor(invulnerable * 12) % 2 === 0) {
-          ctx.fillStyle = "rgba(255,255,255,.065)";
-          ctx.fillRect(0, 0, width, height);
-        }
-        ctx.restore();
-      }
-
-      function loop(timestamp) {
-        const delta = Math.min(.034, (timestamp - lastFrame || 16) / 1000);
-        lastFrame = timestamp;
-        update(delta, timestamp);
-        render(delta, timestamp);
-        rafId = requestAnimationFrame(loop);
-      }
-
-      function handleKeydown(event) {
-        const key = event.key.toLowerCase();
-        if (["arrowleft", "arrowright", "a", "d", " "].includes(key)) event.preventDefault();
-        if (gameOver) return;
-        if (key === "arrowleft" || key === "a") moveLane(-1);
-        if (key === "arrowright" || key === "d") moveLane(1);
-        if (key === " ") startGame();
-      }
-
-      function attachControl(button, direction) {
-        if (!button || button.dataset.ready) return;
-        button.dataset.ready = "true";
-        button.addEventListener("pointerdown", event => {
-          event.preventDefault();
-          button.classList.add("is-pressed");
-          moveLane(direction);
-        });
-        ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
-          button.addEventListener(type, () => button.classList.remove("is-pressed"));
-        });
-      }
-
-      canvas.addEventListener("pointerdown", event => {
-        if (gameOver) return;
-        event.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        moveLane(event.clientX - rect.left < rect.width / 2 ? -1 : 1);
-      });
-
-      document.addEventListener("keydown", handleKeydown);
-      attachControl(leftButton, -1);
-      attachControl(rightButton, 1);
-      if (restartButton) restartButton.addEventListener("click", restartGame);
-      window.addEventListener("resize", resizeCanvas);
-      document.addEventListener("visibilitychange", () => { paused = document.hidden || gameOver; });
-      window.addEventListener("beforeunload", () => { if (rafId) cancelAnimationFrame(rafId); }, { once: true });
-
-      resizeCanvas();
-      updateHud();
-      rafId = requestAnimationFrame(loop);
-    })();
-  </script>
- 
-</body></html>
+
+      <button
+        id="settingsButton"
+        class="icon-button"
+        type="button"
+        aria-label="Open settings"
+      >
+        <span aria-hidden="true">⚙</span>
+      </button>
+    </header>
+
+    <main id="app" class="app-main">
+
+      <!-- =========================
+           HOME SCREEN
+      ========================== -->
+      <section
+        id="homeScreen"
+        class="screen screen-home active"
+        aria-labelledby="homeTitle"
+      >
+        <div class="home-content">
+          <div class="logo-badge" aria-hidden="true">
+            <span>60</span>
+            <small>SEC</small>
+          </div>
+
+          <p class="eyebrow">THE ULTIMATE SPEED TEST</p>
+
+          <h1 id="homeTitle" class="game-title">
+            60 SECOND
+            <span>RUSH</span>
+          </h1>
+
+          <p class="tagline">Think Fast. Tap Faster.</p>
+
+          <div class="home-stats" aria-label="Game statistics">
+            <div class="stat-card">
+              <span class="stat-label">BEST SCORE</span>
+              <strong id="homeBestScore">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">COINS</span>
+              <strong id="homeCoins">0</strong>
+            </div>
+
+            <div class="stat-card">
+              <span class="stat-label">STREAK</span>
+              <strong id="homeStreak">0</strong>
+            </div>
+          </div>
+
+          <div class="home-actions">
+            <button
+              id="playButton"
+              class="primary-button large-button"
+              type="button"
+            >
+              <span>PLAY</span>
+              <span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+
+            <button
+              id="howToPlayButton"
+              class="secondary-button large-button"
+              type="button"
+            >
+              HOW TO PLAY
+            </button>
+          </div>
+
+          <button
+            id="cosmeticsButton"
+            class="text-button"
+            type="button"
+          >
+            COSMETICS
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================
+           GAME SCREEN
+      ========================== -->
+      <section
+        id="gameScreen"
+        class="screen screen-game"
+        aria-label="Game"
+      >
+        <div class="game-container">
+
+          <div class="game-hud">
+            <div class="hud-card timer-card">
+              <span class="hud-label">TIME</span>
+              <strong id="timerValue">60</strong>
+            </div>
+
+            <div class="hud-card score-card">
+              <span class="hud-label">SCORE</span>
+              <strong id="scoreValue">0</strong>
+            </div>
+
+            <div class="hud-card combo-card">
+              <span class="hud-label">COMBO</span>
+              <strong id="comboValue">0</strong>
+            </div>
+          </div>
+
+          <div
+            id="timerBar"
+            class="timer-bar"
+            role="progressbar"
+            aria-label="Time remaining"
+            aria-valuemin="0"
+            aria-valuemax="60"
+            aria-valuenow="60"
+          >
+            <div id="timerBarFill" class="timer-bar-fill"></div>
+          </div>
+
+          <div class="challenge-meta">
+            <span id="challengeType">CHALLENGE</span>
+            <span id="challengeNumber">1</span>
+          </div>
+
+          <div
+            id="challengeArea"
+            class="challenge-area"
+            tabindex="-1"
+            aria-live="polite"
+          >
+            <!-- Challenge content is generated by game.js -->
+          </div>
+
+          <div
+            id="feedbackMessage"
+            class="feedback-message"
+            aria-live="assertive"
+            aria-atomic="true"
+          ></div>
+
+        </div>
+      </section>
+
+      <!-- =========================
+           RESULT SCREEN
+      ========================== -->
+      <section
+        id="resultScreen"
+        class="screen screen-result"
+        aria-labelledby="resultTitle"
+      >
+        <div class="result-content">
+          <div class="result-icon" aria-hidden="true">⚡</div>
+
+          <p class="eyebrow">TIME'S UP</p>
+
+          <h2 id="resultTitle">GAME OVER</h2>
+
+          <div class="final-score-card">
+            <span>YOUR SCORE</span>
+            <strong id="finalScore">0</strong>
+          </div>
+
+          <div class="result-stats">
+            <div class="result-stat">
+              <span>BEST SCORE</span>
+              <strong id="resultBestScore">0</strong>
+            </div>
+
+            <div class="result-stat">
+              <span>ACCURACY</span>
+              <strong id="resultAccuracy">0%</strong>
+            </div>
+
+            <div class="result-stat">
+              <span>BEST COMBO</span>
+              <strong id="resultBestCombo">0</strong>
+            </div>
+
+            <div class="result-stat">
+              <span>COINS EARNED</span>
+              <strong id="resultCoins">0</strong>
+            </div>
+          </div>
+
+          <div class="share-card">
+            <p id="shareMessage">
+              I scored 0 in 60 SECOND RUSH! Can you beat me?
+            </p>
+
+            <div class="share-actions">
+              <button
+                id="shareButton"
+                class="secondary-button"
+                type="button"
+              >
+                SHARE RESULT
+              </button>
+
+              <button
+                id="copyShareButton"
+                class="secondary-button"
+                type="button"
+              >
+                COPY RESULT
+              </button>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button
+              id="playAgainButton"
+              class="primary-button large-button"
+              type="button"
+            >
+              PLAY AGAIN
+            </button>
+
+            <button
+              id="resultHomeButton"
+              class="secondary-button large-button"
+              type="button"
+            >
+              HOME
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           HOW TO PLAY SCREEN
+      ========================== -->
+      <section
+        id="howToPlayScreen"
+        class="screen screen-info"
+        aria-labelledby="howToPlayTitle"
+      >
+        <div class="info-content">
+          <button
+            class="back-button"
+            type="button"
+            data-back="home"
+            aria-label="Back to home"
+          >
+            ← BACK
+          </button>
+
+          <p class="eyebrow">READY?</p>
+
+          <h2 id="howToPlayTitle">HOW TO PLAY</h2>
+
+          <div class="rules-list">
+
+            <article class="rule-card">
+              <div class="rule-number">01</div>
+              <div>
+                <h3>YOU HAVE 60 SECONDS</h3>
+                <p>
+                  Solve as many mini challenges as you can before the clock
+                  reaches zero.
+                </p>
+              </div>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-number">02</div>
+              <div>
+                <h3>THINK FAST</h3>
+                <p>
+                  Five challenge types can appear: Color, Number, Memory,
+                  Reaction, and Odd-One-Out.
+                </p>
+              </div>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-number">03</div>
+              <div>
+                <h3>BUILD YOUR COMBO</h3>
+                <p>
+                  Consecutive correct answers increase your multiplier.
+                  Combo bonuses can reach 1.5×.
+                </p>
+              </div>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-number">04</div>
+              <div>
+                <h3>DON'T MISS</h3>
+                <p>
+                  Correct answers earn points. Wrong answers cost points and
+                  reset your combo.
+                </p>
+              </div>
+            </article>
+
+            <article class="rule-card">
+              <div class="rule-number">05</div>
+              <div>
+                <h3>CHASE YOUR BEST</h3>
+                <p>
+                  Your score, best combo, games played, streak and coins are
+                  saved locally in your browser.
+                </p>
+              </div>
+            </article>
+
+          </div>
+
+          <button
+            id="infoPlayButton"
+            class="primary-button large-button"
+            type="button"
+          >
+            LET'S RUSH
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================
+           SETTINGS SCREEN
+      ========================== -->
+      <section
+        id="settingsScreen"
+        class="screen screen-info"
+        aria-labelledby="settingsTitle"
+      >
+        <div class="info-content">
+          <button
+            class="back-button"
+            type="button"
+            data-back="home"
+            aria-label="Back to home"
+          >
+            ← BACK
+          </button>
+
+          <p class="eyebrow">CUSTOMIZE</p>
+
+          <h2 id="settingsTitle">SETTINGS</h2>
+
+          <div class="settings-list">
+
+            <div class="setting-row">
+              <div class="setting-copy">
+                <strong>SOUND</strong>
+                <span>Game sounds and feedback</span>
+              </div>
+
+              <button
+                id="soundToggle"
+                class="toggle-button"
+                type="button"
+                role="switch"
+                aria-checked="true"
+              >
+                <span class="toggle-track">
+                  <span class="toggle-knob"></span>
+                </span>
+                <span class="toggle-text">ON</span>
+              </button>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-copy">
+                <strong>VIBRATION</strong>
+                <span>Haptic feedback on supported devices</span>
+              </div>
+
+              <button
+                id="vibrationToggle"
+                class="toggle-button"
+                type="button"
+                role="switch"
+                aria-checked="true"
+              >
+                <span class="toggle-track">
+                  <span class="toggle-knob"></span>
+                </span>
+                <span class="toggle-text">ON</span>
+              </button>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-copy">
+                <strong>THEME</strong>
+                <span>Choose your visual mode</span>
+              </div>
+
+              <button
+                id="themeToggle"
+                class="toggle-button"
+                type="button"
+                role="switch"
+                aria-checked="false"
+              >
+                <span class="toggle-track">
+                  <span class="toggle-knob"></span>
+                </span>
+                <span class="toggle-text">DARK</span>
+              </button>
+            </div>
+
+          </div>
+
+          <div class="settings-note">
+            <strong>LOCAL SAVE</strong>
+            <p>
+              Your progress and settings are stored only in this browser using
+              localStorage. No account or server is required.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================
+           COSMETICS SCREEN
+      ========================== -->
+      <section
+        id="cosmeticsScreen"
+        class="screen screen-info"
+        aria-labelledby="cosmeticsTitle"
+      >
+        <div class="info-content">
+          <button
+            class="back-button"
+            type="button"
+            data-back="home"
+            aria-label="Back to home"
+          >
+            ← BACK
+          </button>
+
+          <p class="eyebrow">MAKE IT YOURS</p>
+
+          <h2 id="cosmeticsTitle">COSMETICS</h2>
+
+          <p class="section-description">
+            Spend coins on cosmetic themes and avatars. These items do not
+            affect gameplay.
+          </p>
+
+          <div id="cosmeticsGrid" class="cosmetics-grid">
+
+            <button
+              class="cosmetic-card selected"
+              type="button"
+              data-cosmetic="classic"
+              data-cost="0"
+            >
+              <span class="cosmetic-preview classic-preview">
+                <span>60</span>
+              </span>
+
+              <span class="cosmetic-info">
+                <strong>CLASSIC</strong>
+                <small>FREE</small>
+              </span>
+
+              <span class="cosmetic-status">SELECTED</span>
+            </button>
+
+            <button
+              class="cosmetic-card"
+              type="button"
+              data-cosmetic="neon"
+              data-cost="50"
+            >
+              <span class="cosmetic-preview neon-preview">
+                <span>⚡</span>
+              </span>
+
+              <span class="cosmetic-info">
+                <strong>NEON</strong>
+                <small>50 COINS</small>
+              </span>
+
+              <span class="cosmetic-status">LOCKED</span>
+            </button>
+
+            <button
+              class="cosmetic-card"
+              type="button"
+              data-cosmetic="sunset"
+              data-cost="100"
+            >
+              <span class="cosmetic-preview sunset-preview">
+                <span>☀</span>
+              </span>
+
+              <span class="cosmetic-info">
+                <strong>SUNSET</strong>
+                <small>100 COINS</small>
+              </span>
+
+              <span class="cosmetic-status">LOCKED</span>
+            </button>
+
+            <button
+              class="cosmetic-card"
+              type="button"
+              data-cosmetic="mint"
+              data-cost="150"
+            >
+              <span class="cosmetic-preview mint-preview">
+                <span>✦</span>
+              </span>
+
+              <span class="cosmetic-info">
+                <strong>MINT</strong>
+                <small>150 COINS</small>
+              </span>
+
+              <span class="cosmetic-status">LOCKED</span>
+            </button>
+
+          </div>
+
+          <div class="cosmetics-balance">
+            <span>YOUR COINS</span>
+            <strong id="cosmeticsCoins">0</strong>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =========================
+         TOAST
+    ========================== -->
+    <div
+      id="toast"
+      class="toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <!-- =========================
+         SCREEN READER LIVE REGION
+    ========================== -->
+    <div
+      id="liveRegion"
+      class="sr-only"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+  </div>
+
+  <script src="game.js" defer></script>
+</body>
+</html>
