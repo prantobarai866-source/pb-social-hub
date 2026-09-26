@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEON RUSH: SKYLINE ESCAPE - Version 2</title>
+  <style>
+    * { box-sizing: border-box; user-select: none; }
+    html, body { height: 100%; margin: 0; background: #050712; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      overflow: hidden;
+      color: #fff;
+      background: radial-gradient(circle at 30% -10%, rgba(0,180,255,.15), transparent 40%),
+                  radial-gradient(circle at 70% 0%, rgba(255,0,180,.15), transparent 40%),
+                  linear-gradient(#07051a, #040315 60%, #02020a);
+    }
+
+    canvas { display: block; margin: 0 auto; background: linear-gradient(#1b0f2a 0%, #0a0a1a 60%, #080815 100%); border: 1px solid rgba(120,240,255,.25); }
+
+    .title {
+      position: absolute; top: 8px; left: 0; right: 0; text-align: center;
+      font-weight: 900; font-size: 28px; letter-spacing: 2px;
+      color: #fff; text-shadow: 0 0 12px rgba(0,255,255,.6);
+      z-index: 5;
+    }
+    .tagline { position: absolute; top: 38px; left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(255,255,255,.85); z-index: 5; }
+
+    .hud {
+      position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+      width: 940px; display: flex; justify-content: space-between; gap: 12px;
+      padding: 6px 10px; background: rgba(0,0,0,.25); border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.4); z-index: 5;
+      font-weight: bold;
+    }
+    .hud > div { padding: 6px 12px; border-radius: 8px; background: rgba(0,0,0,.25); }
+
+    .overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.5); z-index: 20;
+    }
+    .overlayInner {
+      background: rgba(10,10,20,.92); padding: 22px 28px; border-radius: 14px;
+      text-align: center; max-width: 680px; width: 90%;
+      border: 1px solid rgba(120,240,255,.25);
+      box-shadow: 0 6px 40px rgba(0,0,0,.5);
+    }
+    .overlay h1 { margin: 6px 0 8px; font-size: 40px; background: linear-gradient(90deg, #60f7ff, #ff5edb); -webkit-background-clip: text; color: transparent; }
+    .overlay p { margin: 6px 0; color: #d9d4f5; }
+    .overlay button {
+      margin-top: 12px; padding: 12px 22px; font-size: 16px; border-radius: 10px; border: none;
+      background: linear-gradient(90deg, #00d1ff, #7a5cff); color: white; cursor: pointer;
+      box-shadow: 0 6px 20px rgba(125, 80, 255, .5);
+    }
+    .overlay button:hover { transform: scale(1.04); }
+
+    .shopBtn {
+      position: absolute; top: 12px; right: 12px; z-index: 6;
+      padding: 10px 14px; font-weight: bold; border-radius: 8px;
+      border: none; cursor: pointer;
+      background: linear-gradient(90deg, #00d1ff, #7a5cff);
+      color: white; box-shadow: 0 6px 16px rgba(0,0,0,.4);
+    }
+
+    /* Shop Overlay */
+    .shopOverlay {
+      display: none; position: absolute; inset: 0; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.65); z-index: 25;
+    }
+    .shopPanel {
+      width: min(760px, 92vw); max-height: 80vh; overflow: auto;
+      background: rgba(10,10,20,.95); padding: 18px; border-radius: 12px;
+      border: 1px solid rgba(120,240,255,.3);
+    }
+    .shopGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card {
+      padding: 12px; border-radius: 12px; border: 1px solid rgba(120,240,255,.25);
+      background: linear-gradient(#14121e, #0b0b14);
+    }
+    .card h3 { margin: 6px 0 8px; font-size: 14px; }
+    .colorPreview {
+      height: 46px; border-radius: 8px; border: 1px solid rgba(255,255,255,.25);
+    }
+    .price { font-weight: bold; margin-top: 6px; }
+    .ctaRow { display: flex; gap: 6px; margin-top: 8px; justify-content: space-between; }
+    .btn {
+      padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(90deg, #00d1ff, #4dffb8); color: #001018; font-weight: bold;
+    }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+    /* Mobile controls */
+    .mobileControls {
+      position: absolute; left: 0; right: 0; bottom: 12px; display: none; justify-content: space-between; padding: 0 16px; z-index: 6;
+    }
+    .joystick, .boostBtn {
+      width: 90px; height: 90px; border-radius: 50%; display: grid; place-items: center;
+      background: rgba(0,0,0,.45); border: 2px solid rgba(120,240,255,.6);
+      box-shadow: 0 8px 20px rgba(0,0,0,.5);
+      touch-action: none;
+    }
+    .boostBtn { width: 110px; height: 110px; border-radius: 50%; font-size: 14px; }
+    @media (max-width: 860px) {
+      .hud { width: 92vw; padding: 6px; }
+      .mobileControls { display: flex; }
+    }
+  </style>
+</head>
+<body>
+  <div class="title">NEON RUSH: SKYLINE ESCAPE</div>
+  <div class="tagline">Dodge • Collect • Boost • Survive</div>
+
+  <button class="shopBtn" id="openShopBtn">Shop</button>
+
+  <div class="hud" id="hud">
+    <div id="scoreBox">Score: 0</div>
+    <div id="levelBox">Level: 1</div>
+    <div id="bestBox">Best: 0</div>
+    <div id="speedBox">Speed: 8</div>
+    <div id="nitroBox">Nitro: 100</div>
+    <div id="creditsBox">Credits: 0</div>
+    <div id="livesBox">Lives: 3</div>
+  </div>
+
+  <canvas id="gameCanvas" width="960" height="640"></canvas>
+
+  <!-- Start / Game Over overlays -->
+  <div class="overlay" id="startScreen">
+    <div class="overlayInner">
+      <h1>NEON RUSH</h1>
+      <p>Move with Arrow Keys / A D</p>
+      <p>Hold Shift to Boost</p>
+      <p>Collect Energy Orbs, Dodge Traffic, Chase the Skyline</p>
+      <button onclick="startGame()">START GAME</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="gameOverScreen" style="display:none;">
+    <div class="overlayInner">
+      <h1>GAME OVER</h1>
+      <p id="finalScore">Score: 0</p>
+      <p id="finalBest">Best: 0</p>
+      <button onclick="startGame()">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Shop Overlay -->
+  <div class="shopOverlay" id="shopOverlay">
+    <div class="shopPanel">
+      <h2 style="margin:6px 0 12px; text-align:center;">Shop & Unlocks</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+        <div>Credits: <strong id="shopCredits">0</strong></div>
+        <div>Current Skin: <span id="shopCurrentSkin">Azure Neon</span></div>
+      </div>
+      <div class="shopGrid" id="shopGrid">
+        <!-- Cards injected by script -->
+      </div>
+      <div style="text-align:right; margin-top:8px;">
+        <button class="btn" onclick="closeShop()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile controls -->
+  <div class="mobileControls" id="mobileControls">
+    <div class="joystick" id="leftBtn" title="Left">◀</div>
+    <div class="boostBtn" id="boostBtn" title="Boost">Boost</div>
+    <div class="joystick" id="rightBtn" title="Right">▶</div>
+  </div>
+
+  <script>
+    // Neon Rush: Skyline Escape - Version 2 (Original, self-made)
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // HUD elements
+    const scoreBox = document.getElementById("scoreBox");
+    const levelBox = document.getElementById("levelBox");
+    const bestBox = document.getElementById("bestBox");
+    const speedBox = document.getElementById("speedBox");
+    const nitroBox = document.getElementById("nitroBox");
+    const creditsBox = document.getElementById("creditsBox");
+    const livesBox = document.getElementById("livesBox");
+    const openShopBtn = document.getElementById("openShopBtn");
+
+    const startScreen = document.getElementById("startScreen");
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const finalScore = document.getElementById("finalScore");
+    const finalBest = document.getElementById("finalBest");
+
+    const shopOverlay = document.getElementById("shopOverlay");
+    const shopCreditsEl = document.getElementById("shopCredits");
+    const shopCurrentSkinEl = document.getElementById("shopCurrentSkin");
+    const shopGrid = document.getElementById("shopGrid");
+
+    let gameRunning = false;
+    let frame = 0;
+    let score = 0;
+    let best = Number(localStorage.getItem("nr_best") || 0);
+
+    let level = 1;
+    let lives = 3;
+    let credits = Number(localStorage.getItem("nr_credits") || 0);
+
+    // Nitro
+    let nitro = 100; // 0-100
+    let nitroActive = false;
+
+    // Road / perspective
+    const road = {
+      left: 120,
+      right: 840,
+      laneCount: 3
+    };
+
+    // Player
+    const player = {
+      lane: 1, // 0..2
+      x: 0,
+      y: 520,
+      w: 74,
+      h: 120,
+      colorIndex: 0, // skin
+      tilt: 0,
+      targetX: 0,
+      invincible: 0
+    };
+
+    // Skin presets (colors)
+    const skins = [
+      { id: "blue", name: "Azure Neon", color: "#49e6ff", unlocked: true, price: 0 },
+      { id: "pink", name: "Pink Pulse", color: "#ff5edb", unlocked: false, price: 180 },
+      { id: "green", name: "Lime Flux", color: "#30ff88", unlocked: false, price: 220 }
+    ];
+    // Load skins unlocks
+    const savedSkins = JSON.parse(localStorage.getItem("nr_skins") || "null");
+    if (savedSkins) {
+      for (let i = 0; i < skins.length; i++) skins[i].unlocked = savedSkins[i];
+    }
+
+    // Current skin
+    let currentSkinIndex = 0; // default blue
+    if (typeof localStorage !== "undefined") {
+      const savedIndex = Number(localStorage.getItem("nr_current_skin"));
+      if (!isNaN(savedIndex)) currentSkinIndex = savedIndex;
+    }
+
+    function baseLaneX(lane, y, w = 74) {
+      // Perspective: lanes converge slightly as y increases
+      const t = Math.max(0, Math.min(1, (y - 260) / (canvas.height - 260)));
+      const left = road.left + t * 20;
+      const right = road.right - t * 20;
+      const laneW = (right - left) / road.laneCount;
+      return left + lane * laneW + (laneW - w) / 2;
+    }
+
+    function resetPlayer() {
+      player.lane = 1;
+      player.x = baseLaneX(player.lane, player.y, player.w);
+      player.targetX = player.x;
+      player.tilt = 0;
+      player.invincible = 0;
+    }
+
+    // UI update
+    function updateHUD() {
+      scoreBox.textContent = "Score: " + score;
+      levelBox.textContent = "Level: " + level;
+      bestBox.textContent = "Best: " + Math.max(best, score);
+      speedBox.textContent = "Speed: " + (baseSpeed + (nitroActive ? 4 : 0)).toFixed(1);
+      nitroBox.textContent = "Nitro: " + Math.floor(nitro);
+      creditsBox.textContent = "Credits: " + credits;
+      livesBox.textContent = "Lives: " + lives;
+    }
+
+    // Game state
+    let baseSpeed = 8;
+    let speed = baseSpeed;
+
+    // Entities
+    let enemies = []; // traffic/police cars
+    let orbs = [];    // energy/credits orbs
+    let particles = [];
+    let flashes = [];
+
+    // Simple sound (Web Audio)
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new AudioCtx();
+    }
+    function beep(freq, dur = 0.08, vol = 0.2) {
+      ensureAudio();
+      const t0 = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.type = "triangle";
+      g.gain.value = vol;
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(t0); osc.stop(t0 + dur);
+    }
+    function playBoost() { beep(900, 0.04, 0.25); beep(1200, 0.04, 0.25); }
+    function playHit() { beep(180, 0.08, 0.25); beep(320, 0.08, 0.25); }
+    function playCoin() { beep(520, 0.05, 0.25); }
+
+    // Collision check
+    function rectsCollide(a, b) {
+      return (
+        a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y
+      );
+    }
+
+    // Spawns
+    function spawnEnemy() {
+      const lane = Math.floor(Math.random() * road.laneCount);
+      const w = 82, h = 128;
+      const y = -h;
+      const x = baseLaneX(lane, y, w);
+      const t = Math.random();
+      const isPolice = t < 0.25;
+      enemies.push({
+        id: Math.random().toString(36).slice(2),
+        lane, x, y, w, h,
+        speed: speed * (1.0 + Math.random() * 0.6) + (level * 0.4),
+        color: isPolice ? "#ff2d55" : ["#ff9f1c", "#b84dff", "#00e5ff"][Math.floor(Math.random()*3)],
+        type: isPolice ? "police" : "traffic",
+        drift: (Math.random() - 0.5) * 0.6
+      });
+    }
+
+    function spawnOrb() {
+      const lane = Math.floor(Math.random() * road.laneCount);
+      const y = -40;
+      const w = 20, h = 20;
+      const x = baseLaneX(lane, y, w) + w/2;
+      orbs.push({ lane, x, y, w, h, glow: 0 });
+    }
+
+    function spawnBoss() {
+      // Boss car (faster, bigger, central lane)
+      const lane = 1;
+      const w = 110, h = 150;
+      const x = baseLaneX(lane, canvas.height - 150, w);
+      enemies.push({
+        id: Math.random().toString(36).slice(2),
+        lane, x, y: -h, w, h,
+        speed: speed * 2.0 + 2, // fast
+        color: "#ff3d6e",
+        type: "boss",
+        drift: 0
+      });
+    }
+
+    // Player drawing (3D-ish with perspective)
+    function drawCar(x, y, w, h, color, glow = false, tilt = 0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      // body
+      const g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, color);
+      g.addColorStop(1, "#0b0f1a");
+      ctx.fillStyle = g;
+      ctx.strokeStyle = "rgba(255,255,255,.2)";
+      ctx.lineWidth = 1;
+      // body rounded
+      roundRect(ctx, -w/2, 0, w, h, 14, true, true);
+
+      // cockpit glow
+      if (glow) {
+        ctx.fillStyle = "rgba(120,255,255,.15)";
+        ctx.fillRect(-w/2+8, 20, w-16, h/2);
+      }
+
+      // wheels
+      ctx.fillStyle = "#111";
+      ctx.fillRect(-w/2 + 8, h - 20, 24, 12);
+      ctx.fillRect(w/2 - 32, h - 20, 24, 12);
+
+      // highlights
+      ctx.fillStyle = "rgba(255,255,255,.5)";
+      ctx.fillRect(-w/4, 8, w/2, 6);
+
+      ctx.restore();
+    }
+
+    function roundRect(context, x, y, w, h, r, fill, stroke) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + w, y, x + w, y + h, r);
+      context.arcTo(x + w, y + h, x, y + h, r);
+      context.arcTo(x, y + h, x, y, r);
+      context.arcTo(x, y, x + w, y, r);
+      context.closePath();
+      if (fill) context.fill();
+      if (stroke) context.stroke();
+    }
+
+    // On-screen controls (mobile)
+    const leftBtn = document.getElementById("leftBtn");
+    const rightBtn = document.getElementById("rightBtn");
+    const boostBtn = document.getElementById("boostBtn");
+    const mobileControls = document.getElementById("mobileControls");
+
+    // Open shop
+    document.getElementById("openShopBtn").addEventListener("click", () => {
+      openShop();
+    });
+
+    function openShop() {
+      shopOverlay.style.display = "flex";
+      refreshShop();
+      // update skin info
+      shopCreditsEl.textContent = credits;
+      shopCurrentSkinEl.textContent = skins[currentSkinIndex].name;
+    }
+    function closeShop() {
+      shopOverlay.style.display = "none";
+    }
+
+    // Build shop grid
+    function refreshShop() {
+      shopGrid.innerHTML = "";
+      skins.forEach((s, idx) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const unlocked = s.unlocked;
+        card.innerHTML = `
+          <div style="height:8px;"></div>
+          <div class="colorPreview" style="background:${s.color};"></div>
+          <h3>${s.name}</h3>
+          <div class="price">${unlocked ? "Unlocked" : "Price: " + s.price} credits</div>
+          <div class="ctaRow">
+            <button class="btn" ${unlocked ? "onclick='setSkin("+idx+")'" : ""} ${unlocked ? "" : ""} ${unlocked ? "" : "disabled"}>${unlocked ? "Equip" : "Buy"}</button>
+            ${unlocked ? "" : `<button class="btn" onclick="buySkin(${idx})" ${unlocked ? "disabled" : ""}>Buy</button>`}
+          </div>
+        `;
+        // If unlocked, show equip button even if not visible above
+        shopGrid.appendChild(card);
+      });
+      // Ensure current skin label
+      shopCurrentSkinEl.textContent = skins[currentSkinIndex].name;
+    }
+
+    function buySkin(idx) {
+      const s = skins[idx];
+      if (s.unlocked) return;
+      if (credits >= s.price) {
+        credits -= s.price;
+        s.unlocked = true;
+        localStorage.setItem("nr_skins", JSON.stringify(skins.map(sk => sk.unlocked)));
+        localStorage.setItem("nr_credits", credits);
+        refreshShop();
+        updateHUD();
+        // small sound
+        playCoin();
+      } else {
+        // insufficient credits beep
+        beep(220, 0.1, 0.15);
+      }
+    }
+
+    function setSkin(idx) {
+      if (!skins[idx].unlocked) return;
+      currentSkinIndex = idx;
+      localStorage.setItem("nr_current_skin", idx);
+      // reflect in HUD
+      updateHUD();
+      // close to apply quickly
+      closeShop();
+    }
+
+    // On resize/mobile detection
+    function detectMobileControls() {
+      if (window.innerWidth < 860) {
+        mobileControls.style.display = "flex";
+      } else {
+        mobileControls.style.display = "none";
+      }
+    }
+    window.addEventListener("resize", detectMobileControls);
+    detectMobileControls();
+
+    // Input
+    const keys = {};
+    window.addEventListener("keydown", (e) => {
+      keys[e.key.toLowerCase()] = true;
+      // immediate lane switch
+      if (!gameRunning) return;
+      if ((e.key === "ArrowLeft" || e.key.toLowerCase() === "a") && player.lane > 0) {
+        player.lane--;
+        player.targetX = baseLaneX(player.lane, player.y, player.w);
+      } else if ((e.key === "ArrowRight" || e.key.toLowerCase() === "d") && player.lane < road.laneCount - 1) {
+        player.lane++;
+        player.targetX = baseLaneX(player.lane, player.y, player.w);
+      }
+      // Boost via shift
+      if (e.key.toLowerCase() === "shift") {
+        nitroActive = true;
+      }
+    });
+    window.addEventListener("keyup", (e) => {
+      keys[e.key.toLowerCase()] = false;
+      if (e.key.toLowerCase() === "shift") {
+        nitroActive = false;
+      }
+    });
+
+    // Mobile touch handlers
+    function bindTouchControls() {
+      const left = document.getElementById("leftBtn");
+      const right = document.getElementById("rightBtn");
+      const boost = document.getElementById("boostBtn");
+      function onDownSide(dir) {
+        if (!gameRunning) return;
+        if (dir === "left" && player.lane > 0) {
+          player.lane--;
+          player.targetX = baseLaneX(player.lane, player.y, player.w);
+        }
+        if (dir === "right" && player.lane < road.laneCount - 1) {
+          player.lane++;
+          player.targetX = baseLaneX(player.lane, player.y, player.w);
+        }
+      }
+      left.addEventListener("pointerdown", () => { onDownSide("left"); });
+      right.addEventListener("pointerdown", () => { onDownSide("right"); });
+      boost.addEventListener("pointerdown", () => { nitroActive = true; });
+      boost.addEventListener("pointerup", () => { nitroActive = false; });
+      boost.addEventListener("pointercancel", () => { nitroActive = false; });
+    }
+    bindTouchControls();
+
+    // Spawning and game loop
+    function spawnEnemy() {
+      const lane = Math.floor(Math.random() * road.laneCount);
+      const w = 82, h = 128;
+      const y = -h;
+      const x = baseLaneX(lane, y, w);
+      const t = Math.random();
+      const isPolice = t < 0.25;
+      enemies.push({
+        id: Math.random().toString(36).slice(2),
+        lane, x, y, w, h,
+        speed: speed * (1.0 + Math.random() * 0.8) + (level * 0.4),
+        color: isPolice ? "#ff2d55" : ["#ff9f1c", "#b84dff", "#00e5ff"][Math.floor(Math.random()*3)],
+        type: isPolice ? "police" : "traffic",
+        drift: (Math.random() - 0.5) * 0.6
+      });
+    }
+
+    function spawnOrb() {
+      const lane = Math.floor(Math.random() * road.laneCount);
+      const y = -40;
+      const w = 18, h = 18;
+      const x = baseLaneX(lane, y, w) + w/2;
+      orbs.push({ lane, x, y, w, h, glow: 0 });
+    }
+
+    function createParticles(x, y, color, count = 15) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random()-0.5)*6,
+          vy: (Math.random()-0.5)*6,
+          life: 28 + Math.random()*20,
+          color
+        });
+      }
+    }
+
+    function flash(color) {
+      flashes.push({ color, alpha: 0.28 });
+    }
+
+    // Main game loop
+    function gameLoop() {
+      if (!gameRunning) return;
+
+      frame++;
+      // Difficulty scaling
+      if (frame % 300 === 0) {
+        level++;
+        baseSpeed += 0.5;
+        speed = baseSpeed;
+        // occasional boss spawn every 3 levels
+        if (level % 3 === 0) {
+          spawnBoss();
+        }
+      }
+
+      // Nitro recharge
+      if (!nitroActive && nitro < 100) nitro = Math.min(100, nitro + 0.4);
+
+      // Spawns
+      if (frame % Math.max(40, 60 - level * 5) === 0) spawnEnemy();
+      if (frame % 120 === 0) spawnOrb();
+      if (level >= 2 && frame % 900 === 0) spawnBoss(); // extra boss chance later
+
+      // Player input / movement
+      updatePlayer();
+
+      // Update entities
+      updateEnemies();
+      updateOrbs();
+      updateParticles();
+      updateFlashes();
+
+      // Score / credits
+      score += Math.floor(speed * 0.25);
+      credits = Math.max(0, credits + Math.floor(score * 0.0005));
+      best = Math.max(best, score);
+      localStorage.setItem("nr_best", best);
+      localStorage.setItem("nr_credits", credits);
+      if (best > 0) localStorage.setItem("nr_credits", credits);
+
+      updateHUD();
+
+      // Rendering
+      ctx.clearRect(0,0,canvas.width, canvas.height);
+      drawBackground();
+      drawRoad();
+
+      // Orbs
+      orbs.forEach((o) => drawOrb(o));
+
+      // Enemies
+      enemies.forEach(e => {
+        const scale = 0.8 + (canvas.height - e.y) / canvas.height * 0.4;
+        const ex = e.x;
+        const ey = e.y;
+        drawCar(ex, ey, e.w, e.h, e.color, false, e.drift);
+      });
+
+      // Player
+      const playerX = player.x;
+      const playerTilt = (player.lane - 1) * -0.25; // tilt toward direction
+      const playerW = player.w;
+      const playerH = player.h;
+      // Apply current skin color
+      const skinColor = skins[currentSkinIndex]?.color || skins[0].color;
+      drawCar(playerX, player.y, playerW, playerH, skinColor, true, playerTilt);
+
+      // Particles
+      drawParticles();
+      drawFlashes();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Update player
+    function updatePlayer() {
+      // Move smoothly to target lane
+      player.x += (player.targetX - player.x) * 0.2;
+      // Tilt effect follow
+      player.tilt = (player.targetX - player.x) * 0.002;
+
+      // Boost
+      if (nitroActive && nitro > 0) {
+        speed = Math.min(baseSpeed + 6, speed + 0.3);
+        nitro -= 0.6;
+        if (frame % 2 === 0) createParticles(player.x + player.w/2, player.y + 20, "#60f7ff", 6);
+        if (frame % 5 === 0) playBoost();
+      } else {
+        speed += (baseSpeed - speed) * 0.05;
+      }
+
+      if (player.invincible > 0) player.invincible--;
+
+      // Auto-snapping to within lanes (optional)
+      const lane = player.lane;
+      // nothing else here; lane change handled by input
+    }
+
+    function updateEnemies() {
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const e = enemies[i];
+        e.y += e.speed;
+        e.x += Math.sin((e.y + frame) * 0.04) * (e.drift);
+
+        if (e.y > canvas.height + e.h) {
+          enemies.splice(i, 1);
+          score += 10;
+          continue;
+        }
+
+        if (rectsCollide(playerRect(), enemyRect(e)) && player.invincible <= 0) {
+          lives--;
+          player.invincible = 60;
+          enemies.splice(i, 1);
+          score = Math.max(0, score - 50);
+          flash("#ff5f75");
+          playHit();
+          if (lives <= 0) {
+            endGame();
+            return;
+          }
+        }
+      }
+    }
+
+    function updateOrbs() {
+      for (let i = orbs.length - 1; i >= 0; i--) {
+        const o = orbs[i];
+        o.y += speed * 0.9;
+        o.glow += 0.2;
+        if (o.y > canvas.height + o.h) {
+          orbs.splice(i, 1);
+          continue;
+        }
+        // distance to player
+        const d = Math.hypot((player.x + player.w/2) - o.x, (player.y + player.h/2) - o.y);
+        if (d < 40) {
+          score += 25;
+          credits += 5;
+          orbs.splice(i, 1);
+          createParticles(o.x, o.y, "#60f7ff", 14);
+          playCoin();
+        }
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 1;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function updateFlashes() {
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        flashes[i].alpha -= 0.02;
+        if (flashes[i].alpha <= 0) flashes.splice(i, 1);
+      }
+    }
+
+    function drawBackground() {
+      // gradient sky + distant neon buildings
+      const g = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+      g.addColorStop(0, "#1a102a");
+      g.addColorStop(1, "#0b0a14");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, canvas.height * 0.6);
+
+      // distant city blocks
+      ctx.save();
+      for (let i = 0; i < 6; i++) {
+        const x = (i * 160 - (frame * 0.2) % 320);
+        const w = 100;
+        const h = 160 + (i * 20);
+        ctx.fillStyle = i % 2 ? "rgba(60,0,80,.6)" : "rgba(0,120,255,.6)";
+        ctx.fillRect(x, canvas.height*0.2 - i*8, w, h);
+        // windows glow
+        ctx.fillStyle = "rgba(180,255,240,.3)";
+        for (let y = 0; y < h; y += 12) {
+          if ((i*7 + y) % 28 === 0) ctx.fillRect(x+10, canvas.height*0.2 - i*8 + y, 6, 6);
+        }
+      }
+      ctx.restore();
+
+      // glow sun
+      const cx = canvas.width * 0.5;
+      const cy = 140;
+      const r = 60;
+      const gr = ctx.createRadialGradient(cx, cy, 10, cx, cy, r);
+      gr.addColorStop(0, "rgba(255,230,170,0.95)");
+      gr.addColorStop(0.6, "rgba(255,120,200,0.55)");
+      gr.addColorStop(1, "rgba(255,120,200,0)");
+      ctx.fillStyle = gr;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawRoad() {
+      // road base
+      const left = road.left;
+      const right = road.right;
+      const roadGrad = ctx.createLinearGradient(0, 250, 0, canvas.height);
+      roadGrad.addColorStop(0, "#1b1f3a");
+      roadGrad.addColorStop(1, "#05060d");
+      ctx.fillStyle = roadGrad;
+      ctx.beginPath();
+      ctx.moveTo(left, 250);
+      ctx.lineTo(right, 250);
+      ctx.lineTo(right, canvas.height);
+      ctx.lineTo(left, canvas.height);
+      ctx.closePath();
+      ctx.fill();
+
+      // lane lines (perspective)
+      ctx.strokeStyle = "rgba(0,255,255,.6)";
+      ctx.lineWidth = 2;
+      for (let i = 1; i < road.laneCount; i++) {
+        const t = i / road.laneCount;
+        const x = left + (right - left) * t;
+        ctx.beginPath();
+        ctx.moveTo(x, 250);
+        ctx.lineTo(x - (20 * (frame % 2)), canvas.height);
+        ctx.stroke();
+      }
+
+      // glow on road
+      ctx.fillStyle = "rgba(0,255,255,.04)";
+      ctx.fillRect(0, 250, canvas.width, canvas.height - 250);
+    }
+
+    function drawOrb(o) {
+      ctx.save();
+      const r = 8 + Math.sin(o.glow) * 2;
+      const g = ctx.createRadialGradient(o.x, o.y, 2, o.x, o.y, r+6);
+      g.addColorStop(0, "rgba(90,255,255,1)");
+      g.addColorStop(1, "rgba(90,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, r+6, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCar(x,y,w,h,color,glow=false, tilt=0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(tilt);
+      const g = ctx.createLinearGradient(0,0,0,h);
+      g.addColorStop(0, color);
+      g.addColorStop(1, "#0b0f1a");
+      ctx.fillStyle = g;
+      roundRect(ctx, -w/2, 0, w, h, 12, true, true);
+
+      // cockpit
+      ctx.fillStyle = "rgba(255,255,255,.04)";
+      roundRect(ctx, -w/2 + 8, 18, w - 16, h - 36, 8, true, false);
+
+      // neon glow under
+      ctx.fillStyle = "rgba(0,255,255,.25)";
+      ctx.fillRect(-w/2+8, h-18, w-16, 6);
+
+      // wheels
+      ctx.fillStyle = "#111";
+      ctx.fillRect(-w/2 + 8, h - 14, 22, 10);
+      ctx.fillRect(w/2 - 30, h - 14, 22, 10);
+
+      // police lights
+      ctx.fillStyle = glow ? "rgba(0,255,255,.9)" : "rgba(255,255,255,.6)";
+      ctx.fillRect(-8, 6, 16, 6);
+
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.life / 40;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.restore();
+      }
+    }
+
+    function drawFlashes() {
+      for (const f of flashes) {
+        ctx.save();
+        ctx.fillStyle = `rgba(${f.color}, ${f.alpha})`;
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+    }
+
+    function enemyRect(e) { return { x: e.x, y: e.y, w: e.w, h: e.h }; }
+    function playerRect() { return { x: player.x - player.w/2, y: player.y, w: player.w, h: player.h }; }
+    function rectsCollide(a,b) {
+      return (
+        a.x < b.x + b.w && a.x + a.w > b.x &&
+        a.y < b.y + b.h && a.y + a.h > b.y
+      );
+    }
+
+    function endGame() {
+      gameRunning = false;
+      finalScore.textContent = "Score: " + score;
+      finalBest.textContent = "Best: " + Math.max(best, score);
+      gameOverScreen.style.display = "flex";
+    }
+
+    // Helpers
+    function refreshHUD() { updateHUD(); }
+    function updateScoreScore() { score += 0; }
+
+    // Start / Restart
+    function startGame() {
+      gameRunning = true;
+      frame = 0;
+      score = 0;
+      level = 1;
+      lives = 3;
+      nitro = 100;
+      nitroActive = false;
+      speed = baseSpeed;
+      enemies = [];
+      orbs = [];
+      particles = [];
+      flashes = [];
+      resetPlayer();
+      updateHUD();
+
+      startScreen.style.display = "none";
+      gameOverScreen.style.display = "none";
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Lights / Aesthetic
+    function flash(color) { flashes.push({ color, alpha: 0.28 }); }
+
+    // Background spawn: boss
+    function spawnBoss() { spawnBossInternal(); }
+    let bossActive = false;
+    function spawnBossInternal() {
+      // Boss in middle lane
+      const b = {
+        id: Math.random().toString(36).slice(2),
+        lane: 1,
+        x: baseLaneX(1, canvas.height - 180, 110),
+        y: -180,
+        w: 110, h: 140,
+        speed: speed * 2.0 + 4,
+        color: "#ff5d9e",
+        type: "boss",
+        drift: 0
+      };
+      enemies.push(b);
+      bossActive = true;
+    }
+
+    // Initialize
+    function init() {
+      // Load best/credits
+      best = Number(localStorage.getItem("nr_best") || 0);
+      credits = Number(localStorage.getItem("nr_credits") || 0);
+      // Load selected skin
+      if (typeof localStorage !== "undefined") {
+        const idx = Number(localStorage.getItem("nr_current_skin"));
+        if (!isNaN(idx)) currentSkinIndex = idx;
+      }
+      updateHUD();
+      // Bind shop close via overlay
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && shopOverlay.style.display === "flex") closeShop();
+      });
+    }
+
+    // Orb drawing helper
+    function drawOrb(o) {
+      ctx.save();
+      const r = o.w;
+      const g = ctx.createRadialGradient(o.x, o.y, 2, o.x, o.y, r + 8);
+      g.addColorStop(0, "rgba(90,255,255,1)");
+      g.addColorStop(1, "rgba(90,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(o.x, o.y, r+6, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    // Start
+    init();
+
+    // Wiring controls
+    // Keyboard handled earlier; keyboard state is used
+    // On-screen controls
+    const leftBtn2 = document.getElementById("leftBtn");
+    const rightBtn2 = document.getElementById("rightBtn");
+    const boostBtn2 = document.getElementById("boostBtn");
+
+    leftBtn2 && leftBtn2.addEventListener("pointerdown", () => {
+      if (player.lane > 0) {
+        player.lane--;
+        player.targetX = baseLaneX(player.lane, player.y, player.w);
+      }
+    });
+    rightBtn2 && rightBtn2.addEventListener("pointerdown", () => {
+      if (player.lane < road.laneCount - 1) {
+        player.lane++;
+        player.targetX = baseLaneX(player.lane, player.y, player.w);
+      }
+    });
+    boostBtn2 && boostBtn2.addEventListener("pointerdown", () => { nitroActive = true; });
+    boostBtn2 && boostBtn2.addEventListener("pointerup", () => { nitroActive = false; });
+
+    // Start with intro
+    startScreen.style.display = "flex";
+
+    // Initial drawing of HUD
+    updateHUD();
+
+  </script>
+</body>
+  </html>
