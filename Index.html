@@ -1,8423 +1,1593 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>NEON PURSUIT X — STREET HUNTER</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Neon Pursuit 3D: Cyber City — Street Hunter</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Tailwind CSS, Three.js & Confetti CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
-  -webkit-user-select:none;
-}
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#02060b;
-  color:#fff;
-  font-family:Arial,sans-serif;
-  touch-action:none;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-canvas{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
-}
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #02050f;
+      color: #ffffff;
+      font-family: 'Rajdhani', sans-serif;
+      touch-action: none;
+    }
 
-#ui{
-  position:fixed;
-  inset:0;
-  z-index:5;
-  pointer-events:none;
-}
+    .font-cyber {
+      font-family: 'Orbitron', monospace;
+    }
 
-.auto{
-  pointer-events:auto;
-}
+    canvas#game {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
 
-.panel{
-  background:rgba(3,9,17,.78);
-  border:1px solid rgba(80,220,255,.35);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  box-shadow:
-    0 0 30px rgba(0,220,255,.12),
-    inset 0 0 25px rgba(255,255,255,.025);
-}
+    #ui {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
 
-.hidden{
-  display:none!important;
-}
+    .pointer-auto {
+      pointer-events: auto;
+    }
 
-.glow{
-  box-shadow:
-    0 0 15px rgba(0,230,255,.5),
-    0 0 45px rgba(0,230,255,.15);
-}
+    .hidden {
+      display: none !important;
+    }
 
-@keyframes pulse{
-  50%{
-    box-shadow:
-      0 0 30px rgba(255,30,80,.8),
-      inset 0 0 20px rgba(255,30,80,.15);
-  }
-}
+    .panel {
+      background: rgba(4, 8, 26, 0.88);
+      border: 1px solid rgba(0, 234, 255, 0.4);
+      box-shadow: 0 0 35px rgba(0, 234, 255, 0.15), inset 0 0 25px rgba(255, 0, 119, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
 
-@keyframes scan{
-  0%{transform:translateY(-100%)}
-  100%{transform:translateY(100vh)}
-}
+    .neon-cyan {
+      text-shadow: 0 0 8px #00f0ff, 0 0 20px #00f0ff, 0 0 40px rgba(0, 240, 255, 0.4);
+    }
 
-@keyframes levelup{
-  0%{transform:scale(.5);opacity:0}
-  40%{transform:scale(1.1);opacity:1}
-  100%{transform:scale(1);opacity:0}
-}
+    .neon-pink {
+      text-shadow: 0 0 8px #ff0077, 0 0 20px #ff0077, 0 0 40px rgba(255, 0, 119, 0.4);
+    }
 
-.danger{
-  animation:pulse .7s infinite;
-}
+    .crt-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0.22;
+      background: linear-gradient(rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+      background-size: 100% 4px;
+    }
 
-#scanline{
-  position:fixed;
-  inset:0;
-  z-index:8;
-  pointer-events:none;
-  opacity:.035;
-  background:linear-gradient(
-    transparent 0%,
-    rgba(255,255,255,.8) 50%,
-    transparent 100%
-  );
-  height:18%;
-  animation:scan 7s linear infinite;
-}
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 45px rgba(0, 234, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.2);
+      }
+    }
 
-#levelFlash{
-  position:fixed;
-  left:50%;
-  top:42%;
-  transform:translate(-50%,-50%);
-  z-index:20;
-  pointer-events:none;
-  font-size:38px;
-  font-weight:900;
-  color:#7df7ff;
-  text-shadow:0 0 25px #00eaff;
-  opacity:0;
-}
+    .glow-btn {
+      animation: pulseGlow 2.2s infinite;
+    }
 
-#levelFlash.show{
-  animation:levelup 1.4s ease-out;
-}
+    @keyframes redAlert {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 0, 60, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 35px rgba(255, 0, 60, 0.9);
+      }
+    }
 
-.mission{
-  min-width:150px;
-}
-
-.bar{
-  height:5px;
-  border-radius:99px;
-  overflow:hidden;
-  background:rgba(0,0,0,.6);
-}
-
-.bar>div{
-  height:100%;
-  transition:width .2s;
-}
-
-button{
-  -webkit-tap-highlight-color:transparent;
-}
-</style>
+    .police-pulse {
+      animation: redAlert 0.75s infinite;
+    }
+  </style>
 </head>
 
 <body>
 
-<canvas id="game"></canvas>
-<div id="scanline"></div>
-<div id="levelFlash">LEVEL UP!</div>
+  <canvas id="game"></canvas>
+  <div class="crt-overlay"></div>
 
-<div id="ui">
+  <div id="ui">
 
-<!-- HUD -->
-<div id="hud"
-     class="hidden absolute top-2 left-1/2 -translate-x-1/2 w-[96%] max-w-6xl">
-
-  <div class="panel rounded-2xl px-3 py-2">
-
-    <div class="flex items-center justify-between gap-2">
-
-      <div>
-        <div class="text-[8px] tracking-[2px] text-cyan-300">
-          SPEED
+    <!-- IN-GAME HUD -->
+    <div id="hud" class="hidden absolute top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl flex flex-col gap-2">
+      <div class="panel rounded-2xl px-4 py-2.5 flex justify-between items-center gap-3">
+        <!-- Speedometer -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-400/50 flex items-center justify-center text-cyan-400 font-cyber font-bold">
+            ⚡
+          </div>
+          <div>
+            <div class="text-[9px] text-cyan-400 font-cyber tracking-widest uppercase">Speed</div>
+            <div id="hudSpeed" class="text-xl sm:text-2xl font-cyber font-black neon-cyan">
+              140 <span class="text-xs text-cyan-300 font-normal">KM/H</span>
+            </div>
+          </div>
         </div>
-        <b id="speed" class="text-xl text-cyan-100">0</b>
-        <small class="text-[9px]">KM/H</small>
+
+        <!-- Police Pursuit Alert -->
+        <div id="hudPolice" class="hidden items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/80 border border-red-500 police-pulse">
+          <span class="text-xs font-cyber font-bold text-red-300">
+            🚨 PURSUIT ACTIVE
+          </span>
+        </div>
+
+        <!-- Score & Combo -->
+        <div class="text-center">
+          <div class="text-[9px] text-pink-400 font-cyber tracking-widest uppercase">Score</div>
+          <div id="hudScore" class="text-xl sm:text-2xl font-cyber font-black neon-pink">
+            0
+            <span id="hudCombo" class="hidden ml-1 text-xs text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded font-cyber">
+              1.0x
+            </span>
+          </div>
+        </div>
+
+        <!-- Distance -->
+        <div class="hidden sm:block text-right">
+          <div class="text-[9px] text-amber-400 font-cyber tracking-widest uppercase">Distance</div>
+          <div id="hudDistance" class="text-lg sm:text-xl font-cyber font-black text-amber-300">
+            0 M
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-1.5 pointer-auto">
+          <button id="btnAudio" onclick="toggleAudio()" class="p-2 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-cyan-400 hover:border-cyan-300 transition-colors" title="Toggle Audio">
+            🔊
+          </button>
+          <button onclick="togglePause()" class="p-2 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-cyan-400 hover:border-cyan-300 transition-colors" title="Pause Game">
+            ⏸
+          </button>
+        </div>
       </div>
 
-      <div class="text-center">
-        <div class="text-[8px] tracking-[2px] text-pink-300">
-          SCORE
+      <!-- Secondary Metrics: Nitro, Shield, XP, Objective -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div class="panel rounded-xl px-3 py-1.5 flex flex-col justify-center">
+          <div class="flex justify-between text-[10px] font-cyber text-cyan-400 mb-1">
+            <span>NITRO</span>
+            <span id="hudNitroText">100%</span>
+          </div>
+          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-cyan-500/30">
+            <div id="hudNitroBar" class="h-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full transition-all" style="width:100%"></div>
+          </div>
         </div>
-        <b id="score" class="text-xl text-pink-100">0</b>
-      </div>
 
-      <div class="hidden sm:block text-center">
-        <div class="text-[8px] tracking-[2px] text-amber-300">
-          DISTANCE
+        <div class="panel rounded-xl px-3 py-1.5 flex flex-col justify-center">
+          <div class="flex justify-between text-[10px] font-cyber text-blue-400 mb-1">
+            <span>SHIELD</span>
+            <span id="hudShieldText">1 / 1</span>
+          </div>
+          <div id="hudShieldPills" class="flex gap-1.5 h-2"></div>
         </div>
-        <b id="distance">0 M</b>
-      </div>
 
-      <div class="text-center">
-        <div class="text-[8px] tracking-[2px] text-purple-300">
-          LEVEL
+        <div class="panel rounded-xl px-3 py-1.5 flex flex-col justify-center">
+          <div class="flex justify-between text-[10px] font-cyber text-purple-400 mb-1">
+            <span id="hudLevelText">LEVEL 1</span>
+            <span id="hudXPText">0 / 100 XP</span>
+          </div>
+          <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-purple-500/30">
+            <div id="hudXPBar" class="h-full bg-purple-500 rounded-full transition-all" style="width:0%"></div>
+          </div>
         </div>
-        <b id="level">1</b>
-      </div>
 
-      <div id="police"
-           class="hidden danger px-2.5 py-1 rounded-full
-                  border border-red-400 bg-red-900/40
-                  text-red-200 text-[10px] font-black">
-        🚨 PURSUIT
-      </div>
-
-      <button
-        class="auto p-2 rounded-xl bg-slate-900/90 border border-cyan-500/30"
-        onclick="pauseGame()">
-        ⏸
-      </button>
-
-    </div>
-
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-
-      <div class="rounded-xl bg-black/35 px-2 py-1.5">
-        <div class="flex justify-between text-[9px]">
-          <span class="text-cyan-300">NITRO</span>
-          <span id="nitro">100%</span>
-        </div>
-        <div class="bar mt-1">
-          <div id="nitrobar"
-               style="width:100%;background:linear-gradient(90deg,#00eaff,#9b4dff,#ff3470)">
+        <div class="panel rounded-xl px-3 py-1.5 flex flex-col justify-center">
+          <div class="text-[9px] font-cyber text-amber-400 uppercase">OBJECTIVE</div>
+          <div id="hudMissionText" class="text-[11px] font-medium text-amber-100 truncate mt-0.5">
+            Survive 500m (0/500)
           </div>
         </div>
       </div>
 
-      <div class="rounded-xl bg-black/35 px-2 py-1.5">
-        <div class="flex justify-between text-[9px]">
-          <span class="text-blue-300">SHIELD</span>
-          <span id="shield">●</span>
-        </div>
-        <div class="bar mt-1">
-          <div id="shieldbar"
-               style="width:50%;background:#4c8dff">
-          </div>
+      <!-- Near Miss Toast -->
+      <div id="nearMissToast" class="hidden self-center px-5 py-2 rounded-2xl bg-gradient-to-r from-pink-600/90 to-purple-600/90 border border-pink-400 shadow-[0_0_35px_rgba(255,0,119,0.6)] text-center animate-bounce">
+        <div id="nearMissText" class="text-xs font-cyber font-black tracking-wider text-white">
+          ⚡ NEAR MISS! +350 PTS
         </div>
       </div>
-
-      <div class="rounded-xl bg-black/35 px-2 py-1.5">
-        <div class="flex justify-between text-[9px]">
-          <span class="text-yellow-300">COMBO</span>
-          <span id="combo">x1</span>
-        </div>
-        <div class="bar mt-1">
-          <div id="combobar"
-               style="width:0%;background:#ffd21f">
-          </div>
-        </div>
-      </div>
-
-      <div class="rounded-xl bg-black/35 px-2 py-1.5">
-        <div class="flex justify-between text-[9px]">
-          <span class="text-purple-300">XP</span>
-          <span id="xpText">0 / 100</span>
-        </div>
-        <div class="bar mt-1">
-          <div id="xpbar"
-               style="width:0%;background:#b34dff">
-          </div>
-        </div>
-      </div>
-
     </div>
 
-  </div>
+    <!-- MAIN START MENU -->
+    <div id="startScreen" class="absolute inset-0 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm pointer-auto">
+      <div class="panel rounded-3xl p-6 sm:p-8 w-full max-w-md text-center flex flex-col gap-4">
+        <div class="inline-flex self-center px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-[10px] font-cyber text-cyan-300 tracking-[3px] uppercase">
+          Neo City // Highway Sector 09
+        </div>
 
-  <div class="flex justify-center mt-2">
-    <div id="mission"
-         class="mission panel rounded-xl px-3 py-1.5 text-center text-[10px]">
-      <span class="text-purple-300">MISSION</span>
-      <div id="missionText">Survive the highway</div>
-    </div>
-  </div>
-
-</div>
-
-
-<!-- MAIN MENU -->
-<div id="menu"
-     class="absolute inset-0 flex items-center justify-center p-4
-            bg-gradient-to-b from-black/10 via-black/20 to-black/50">
-
-  <div class="panel rounded-[28px] p-6 sm:p-8 w-full max-w-md text-center">
-
-    <div class="text-[9px] tracking-[5px] text-cyan-300">
-      NEO CITY // SECTOR 09
-    </div>
-
-    <h1 class="text-4xl sm:text-5xl font-black mt-2
-               tracking-tight text-cyan-100">
-      NEON
-      <span class="text-pink-400">PURSUIT</span>
-    </h1>
-
-    <div class="text-[10px] tracking-[4px] text-purple-300 mt-1">
-      STREET HUNTER X
-    </div>
-
-    <p class="text-slate-300 text-sm mt-3">
-      Outrun traffic. Escape the police. Own the night.
-    </p>
-
-    <div class="grid grid-cols-3 gap-2 mt-5">
-
-      <div class="rounded-xl bg-black/40 border border-cyan-500/20 p-2">
-        <div class="text-xl">🚀</div>
-        <small class="text-slate-400">NITRO</small>
-      </div>
-
-      <div class="rounded-xl bg-black/40 border border-pink-500/20 p-2">
-        <div class="text-xl">🚓</div>
-        <small class="text-slate-400">CHASE</small>
-      </div>
-
-      <div class="rounded-xl bg-black/40 border border-purple-500/20 p-2">
-        <div class="text-xl">💎</div>
-        <small class="text-slate-400">LOOT</small>
-      </div>
-
-    </div>
-
-    <div class="mt-4 rounded-2xl bg-black/40
-                border border-slate-700 p-4 text-left">
-
-      <div class="flex justify-between">
         <div>
-          <div class="text-[9px] text-cyan-300 tracking-widest">
-            VEHICLE
+          <h1 class="text-4xl sm:text-5xl font-cyber font-black tracking-tight text-white neon-cyan">
+            NEON <span class="text-pink-500 neon-pink">PURSUIT</span>
+          </h1>
+          <div class="text-[11px] font-cyber tracking-[4px] text-purple-300 uppercase mt-1">
+            Street Hunter 3D
           </div>
-          <b>PHANTOM GT-99</b>
         </div>
 
-        <div class="text-right">
-          <div class="text-[9px] text-amber-300">
-            BEST SCORE
+        <p class="text-xs text-slate-300">
+          Outrun autonomous traffic, graze near-misses, and escape high-intensity police interceptors.
+        </p>
+
+        <!-- Machine Card -->
+        <div class="bg-black/50 border border-slate-800 rounded-2xl p-3.5 text-left flex items-center justify-between">
+          <div>
+            <div class="text-[9px] font-cyber text-cyan-400 uppercase tracking-wider">Ready Machine</div>
+            <div id="menuCarName" class="text-base font-bold font-cyber text-white">PHANTOM GT-99</div>
+            <div id="menuCarClass" class="text-[10px] text-slate-400 font-cyber">SYNTH RUNNER</div>
           </div>
-          <b id="best">0</b>
+          <button onclick="openGarage()" class="px-3.5 py-2 rounded-xl bg-cyan-950/70 border border-cyan-400/50 hover:border-cyan-300 text-cyan-300 text-xs font-cyber font-bold transition-colors">
+            ⚙️ GARAGE
+          </button>
+        </div>
+
+        <!-- Launch Button -->
+        <button onclick="startGame()" class="glow-btn w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-black font-black font-cyber text-base tracking-wider shadow-[0_0_35px_rgba(0,234,255,0.5)] active:scale-98 transition-transform">
+          🚀 LAUNCH PURSUIT
+        </button>
+
+        <!-- Record & Shards -->
+        <div class="grid grid-cols-2 gap-2 text-xs font-cyber text-left">
+          <div class="p-2.5 rounded-xl bg-black/40 border border-slate-800">
+            <div class="text-[9px] text-amber-400 uppercase">🏆 Best Record</div>
+            <div id="menuBestScore" class="font-bold text-white text-sm mt-0.5">0 PTS</div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-black/40 border border-slate-800">
+            <div class="text-[9px] text-cyan-400 uppercase">💎 Data Shards</div>
+            <div id="menuCredits" class="font-bold text-white text-sm mt-0.5">150</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1 border-t border-slate-800/80 text-[10px] text-slate-400 font-cyber">
+          <span>A/D · ARROWS · SWIPE · NITRO</span>
+          <button onclick="toggleAudio()" class="text-slate-300 hover:text-cyan-300 transition-colors">
+            <span id="soundLabel">SOUND: ON</span>
+          </button>
         </div>
       </div>
-
-      <p class="text-[10px] text-slate-500 mt-2">
-        Fictional hypercar • original game vehicle
-      </p>
-
     </div>
 
-    <button
-      class="auto glow w-full mt-5 py-4 rounded-2xl
-             bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500
-             text-black font-black tracking-wider"
-      onclick="startGame()">
-      🚀 LAUNCH PURSUIT
-    </button>
+    <!-- VEHICLE GARAGE -->
+    <div id="garageScreen" class="hidden absolute inset-0 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-md pointer-auto overflow-y-auto">
+      <div class="panel rounded-3xl p-5 sm:p-7 w-full max-w-xl flex flex-col gap-4 text-white my-auto">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <div class="text-[10px] font-cyber text-cyan-400 uppercase tracking-widest">Cybernetics Workshop</div>
+            <h2 class="text-xl sm:text-2xl font-black font-cyber tracking-wide text-white">VEHICLE GARAGE</h2>
+          </div>
+          <div class="px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-500/50 text-xs font-cyber font-bold text-amber-300">
+            💎 <span id="garageCredits">150</span> SHARDS
+          </div>
+        </div>
 
-    <div class="grid grid-cols-2 gap-2 mt-3">
+        <!-- Carousel -->
+        <div class="flex items-center justify-between bg-black/40 border border-slate-800 rounded-2xl p-3">
+          <button onclick="prevCar()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 transition-colors">
+            ◀
+          </button>
+          <div class="text-center">
+            <div id="garageCarClass" class="text-[10px] font-cyber text-cyan-400 uppercase">SYNTH RUNNER</div>
+            <h3 id="garageCarName" class="text-xl sm:text-2xl font-black font-cyber text-white">PHANTOM GT-99</h3>
+          </div>
+          <button onclick="nextCar()" class="p-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-cyan-300 transition-colors">
+            ▶
+          </button>
+        </div>
 
-      <button
-        class="auto py-2 rounded-xl bg-black/40
-               border border-slate-700 text-xs"
-        onclick="toggleSound()">
-        🔊 SOUND: <span id="soundState">ON</span>
-      </button>
+        <!-- Specs -->
+        <div class="bg-black/50 border border-slate-800 rounded-2xl p-4 space-y-3 text-xs font-cyber">
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span class="text-cyan-300">⚡ TOP VELOCITY</span>
+              <span id="statSpeed" class="font-bold text-white">240 KM/H</span>
+            </div>
+            <div class="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="barSpeed" class="h-full bg-cyan-400 rounded-full" style="width:72%"></div>
+            </div>
+          </div>
 
-      <div class="rounded-xl bg-black/40 border border-slate-700
-                  p-2 text-[10px] text-slate-400">
-        A/D • ←/→ • SWIPE • SHIFT
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span class="text-pink-400">🔥 ACCELERATION</span>
+              <span id="statAccel" class="font-bold text-white">85%</span>
+            </div>
+            <div class="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="barAccel" class="h-full bg-pink-500 rounded-full" style="width:85%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span class="text-purple-400">🚀 NITRO BOOST</span>
+              <span id="statNitro" class="font-bold text-white">+85 KM/H</span>
+            </div>
+            <div class="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+              <div id="barNitro" class="h-full bg-purple-500 rounded-full" style="width:65%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Underglow Selector -->
+        <div class="flex items-center justify-between bg-black/40 border border-slate-800 p-3 rounded-2xl">
+          <span class="text-xs font-cyber text-slate-300 uppercase tracking-wider">Neon Underglow</span>
+          <div class="flex items-center gap-2">
+            <button onclick="setUnderglow('#00eaff')" class="w-6 h-6 rounded-full bg-[#00eaff] border border-white hover:scale-110 transition-transform"></button>
+            <button onclick="setUnderglow('#ff0077')" class="w-6 h-6 rounded-full bg-[#ff0077] border border-white hover:scale-110 transition-transform"></button>
+            <button onclick="setUnderglow('#ffaa00')" class="w-6 h-6 rounded-full bg-[#ffaa00] border border-white hover:scale-110 transition-transform"></button>
+            <button onclick="setUnderglow('#00ff66')" class="w-6 h-6 rounded-full bg-[#00ff66] border border-white hover:scale-110 transition-transform"></button>
+            <button onclick="setUnderglow('#a855f7')" class="w-6 h-6 rounded-full bg-[#a855f7] border border-white hover:scale-110 transition-transform"></button>
+            <button onclick="setUnderglow('#ff2244')" class="w-6 h-6 rounded-full bg-[#ff2244] border border-white hover:scale-110 transition-transform"></button>
+          </div>
+        </div>
+
+        <!-- Deploy or Unlock -->
+        <div class="flex items-center gap-3 pt-2">
+          <button id="garageActionBtn" onclick="garageAction()" class="flex-1 py-3.5 rounded-2xl bg-cyan-400 text-slate-950 font-black font-cyber tracking-wider shadow-[0_0_30px_rgba(0,234,255,0.4)]">
+            DEPLOY MACHINE
+          </button>
+          <button onclick="closeGarage()" class="px-6 py-3.5 rounded-2xl bg-slate-900 border border-slate-700 text-slate-300 font-cyber text-xs font-bold">
+            BACK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
+    <div id="pauseScreen" class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md pointer-auto">
+      <div class="panel rounded-3xl p-6 w-full max-w-xs text-center flex flex-col gap-4">
+        <div class="text-[10px] font-cyber tracking-[4px] text-cyan-400 uppercase">Pursuit Standby</div>
+        <h2 class="text-2xl font-black font-cyber text-cyan-100">PAUSED</h2>
+
+        <div class="flex flex-col gap-2.5 pt-2">
+          <button onclick="togglePause()" class="w-full py-3 rounded-xl bg-cyan-400 text-slate-950 font-black font-cyber text-sm tracking-wider">
+            RESUME
+          </button>
+          <button onclick="goHome()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 font-cyber text-xs font-semibold">
+            QUIT TO MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="gameOverScreen" class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md pointer-auto">
+      <div class="panel rounded-3xl p-6 sm:p-8 w-full max-w-md text-center text-white flex flex-col gap-4">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-red-950/80 border border-red-500 flex items-center justify-center text-3xl shadow-[0_0_30px_rgba(255,0,60,0.5)]">
+          💥
+        </div>
+
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-black font-cyber tracking-wider text-red-400">
+            VEHICLE DESTROYED
+          </h2>
+          <div class="text-[10px] font-cyber tracking-[3px] text-slate-400 uppercase mt-1">
+            Pursuit Simulation Terminated
+          </div>
+        </div>
+
+        <div id="recordBadge" class="hidden py-1.5 px-4 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-black font-cyber font-black text-xs">
+          🏆 NEW ALL-TIME RECORD!
+        </div>
+
+        <div class="bg-black/50 border border-slate-800 rounded-2xl p-4 grid grid-cols-2 gap-3 text-left font-cyber">
+          <div class="p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div class="text-[9px] uppercase tracking-wider text-cyan-400">Total Score</div>
+            <div id="finalScore" class="text-lg sm:text-xl font-bold text-white">0</div>
+          </div>
+
+          <div class="p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div class="text-[9px] uppercase tracking-wider text-amber-400">Distance</div>
+            <div id="finalDistance" class="text-lg sm:text-xl font-bold text-white">0 M</div>
+          </div>
+
+          <div class="p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div class="text-[9px] uppercase tracking-wider text-pink-400">Max Velocity</div>
+            <div id="finalSpeed" class="text-lg sm:text-xl font-bold text-white">140 KM/H</div>
+          </div>
+
+          <div class="p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+            <div class="text-[9px] uppercase tracking-wider text-purple-400">Near Misses</div>
+            <div id="finalNearMisses" class="text-lg sm:text-xl font-bold text-white">0</div>
+          </div>
+
+          <div class="col-span-2 p-2 rounded-xl bg-amber-950/30 border border-amber-500/40 flex justify-between items-center">
+            <span class="text-xs text-amber-300">💎 Shards Harvested</span>
+            <span id="finalCredits" class="text-sm font-bold text-amber-200">+0 SHARDS</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2.5 pt-2">
+          <button onclick="startGame()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 text-black font-black font-cyber tracking-wider">
+            🔄 RACE AGAIN
+          </button>
+          <button onclick="goHome()" class="w-full py-3 rounded-2xl bg-slate-900 border border-slate-700 text-slate-300 font-cyber text-xs font-bold">
+            MAIN MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE ON-SCREEN CONTROLS -->
+    <div id="mobileControls" class="hidden absolute bottom-4 left-0 right-0 px-4 sm:px-8 flex items-end justify-between pointer-events-none select-none">
+      <div class="flex items-center gap-3 pointer-auto">
+        <button id="btnLeft" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#030614dd] border-2 border-cyan-400/70 text-cyan-300 flex items-center justify-center text-3xl font-cyber shadow-[0_0_20px_rgba(0,234,255,0.25)] active:scale-95">
+          ◀
+        </button>
+        <button id="btnRight" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#030614dd] border-2 border-pink-400/70 text-pink-300 flex items-center justify-center text-3xl font-cyber shadow-[0_0_20px_rgba(255,0,119,0.25)] active:scale-95">
+          ▶
+        </button>
       </div>
 
+      <div class="pointer-auto">
+        <button id="btnNitro" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-cyan-500 via-purple-600 to-pink-500 border-2 border-white text-white flex flex-col items-center justify-center shadow-[0_0_35px_rgba(168,85,247,0.5)] active:scale-95">
+          <span class="text-2xl">🔥</span>
+          <span class="text-[10px] sm:text-xs font-cyber font-black tracking-wider uppercase">NITRO</span>
+        </button>
+      </div>
     </div>
 
   </div>
-</div>
 
-
-<!-- PAUSE -->
-<div id="pause"
-     class="hidden absolute inset-0 flex items-center justify-center
-            bg-black/60 backdrop-blur-md">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-xs text-center">
-
-    <div class="text-[9px] tracking-[4px] text-cyan-300">
-      PURSUIT SYSTEM
-    </div>
-
-    <h2 class="text-3xl font-black text-cyan-100 mt-1">
-      PAUSED
-    </h2>
-
-    <button
-      class="auto w-full mt-5 py-3 rounded-xl
-             bg-cyan-400 text-black font-bold"
-      onclick="pauseGame()">
-      RESUME
-    </button>
-
-    <button
-      class="auto w-full mt-2 py-3 rounded-xl
-             bg-slate-900 border border-slate-700"
-      onclick="goHome()">
-      MENU
-    </button>
-
-  </div>
-</div>
-
-
-<!-- GAME OVER -->
-<div id="over"
-     class="hidden absolute inset-0 flex items-center justify-center
-            p-4 bg-black/75 backdrop-blur-md">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-md text-center">
-
-    <div class="text-5xl">💥</div>
-
-    <h2 class="text-2xl font-black text-red-400 mt-2">
-      VEHICLE DESTROYED
-    </h2>
-
-    <div class="text-[9px] tracking-[3px] text-slate-500 mt-1">
-      PURSUIT TERMINATED
-    </div>
-
-    <div class="grid grid-cols-2 gap-2 mt-5">
-
-      <div class="bg-black/40 rounded-xl p-3">
-        <small>SCORE</small>
-        <div id="finalScore" class="text-xl font-black">0</div>
-      </div>
-
-      <div class="bg-black/40 rounded-xl p-3">
-        <small>DISTANCE</small>
-        <div id="finalDistance" class="text-xl font-black">0 M</div>
-      </div>
-
-      <div class="bg-black/40 rounded-xl p-3">
-        <small>MAX SPEED</small>
-        <div id="finalSpeed" class="text-xl font-black">0</div>
-      </div>
-
-      <div class="bg-black/40 rounded-xl p-3">
-        <small>LEVEL</small>
-        <div id="finalLevel" class="text-xl font-black">1</div>
-      </div>
-
-    </div>
-
-    <button
-      class="auto w-full mt-5 py-3.5 rounded-2xl
-             bg-gradient-to-r from-cyan-400 to-pink-500
-             text-black font-black"
-      onclick="startGame()">
-      🔄 RACE AGAIN
-    </button>
-
-    <button
-      class="auto w-full mt-2 py-3 rounded-xl
-             bg-slate-900 border border-slate-700"
-      onclick="goHome()">
-      MAIN MENU
-    </button>
-
-  </div>
-</div>
-
-
-<!-- MOBILE CONTROLS -->
-<div id="mobile"
-     class="hidden absolute bottom-3 left-0 right-0
-            px-4 flex justify-between items-end">
-
-  <div class="flex gap-3 auto">
-
-    <button
-      id="left"
-      class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl
-             bg-black/70 border-2 border-cyan-400
-             text-2xl shadow-[0_0_20px_rgba(0,220,255,.25)]">
-      ◀
-    </button>
-
-    <button
-      id="right"
-      class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl
-             bg-black/70 border-2 border-pink-400
-             text-2xl shadow-[0_0_20px_rgba(255,50,120,.25)]">
-      ▶
-    </button>
-
-  </div>
-
-  <button
-    id="boost"
-    class="auto w-20 h-20 sm:w-24 sm:h-24 rounded-full
-           bg-gradient-to-tr from-cyan-400 via-purple-500 to-pink-500
-           border-2 border-white font-black
-           shadow-[0_0_30px_rgba(150,50,255,.45)]">
-    🔥
-    <br>
-    <small>NITRO</small>
-  </button>
-
-</div>
-
-</div>
-
-
-<script>
-
-/* =========================================================
-   NEON PURSUIT X
-   Original fictional arcade racer
-========================================================= */
-
-let scene;
-let camera;
-let renderer;
-let clock;
-
-let player;
-let shieldMesh;
-
-let traffic=[];
-let pickups=[];
-let roadMarks=[];
-let city=[];
-let particles=[];
-let stars=[];
-let policeLights=[];
-
-let running=false;
-let paused=false;
-let boost=false;
-
-let lane=0;
-let targetX=0;
-
-let score=0;
-let distance=0;
-
-let speed=155;
-let maxSpeed=155;
-
-let nitro=100;
-let shield=1;
-
-let spawn=0;
-let pickupSpawn=0;
-
-let policeTimer=0;
-let police=false;
-
-let shake=0;
-
-let level=1;
-let xp=0;
-let xpNeed=100;
-
-let combo=1;
-let comboTimer=0;
-
-let missionType="distance";
-let missionTarget=500;
-let missionProgress=0;
-
-let soundEnabled=true;
-let audioCtx=null;
-
-const laneW=3.15;
-
-const bestKey="neon_pursuit_x_best";
-
-let best=Number(
-  localStorage.getItem(bestKey)||0
-);
-
-
-/* =========================================================
-   AUDIO
-========================================================= */
-
-function audio(){
-
-  if(!soundEnabled)
-    return;
-
-  try{
-
-    if(!audioCtx)
-      audioCtx=
-        new (window.AudioContext||
-        window.webkitAudioContext)();
-
-    if(audioCtx.state==="suspended")
-      audioCtx.resume();
-
-  }catch(e){}
-}
-
-
-function beep(freq=440,duration=.08,type="sine"){
-
-  if(!soundEnabled)
-    return;
-
-  audio();
-
-  if(!audioCtx)
-    return;
-
-  const osc=
-    audioCtx.createOscillator();
-
-  const gain=
-    audioCtx.createGain();
-
-  osc.type=type;
-  osc.frequency.value=freq;
-
-  gain.gain.setValueAtTime(
-    .05,
-    audioCtx.currentTime
-  );
-
-  gain.gain.exponentialRampToValueAtTime(
-    .001,
-    audioCtx.currentTime+duration
-  );
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start();
-
-  osc.stop(
-    audioCtx.currentTime+duration
-  );
-}
-
-
-function toggleSound(){
-
-  soundEnabled=!soundEnabled;
-
-  document.getElementById(
-    "soundState"
-  ).textContent=
-    soundEnabled?"ON":"OFF";
-
-  if(soundEnabled)
-    beep(700,.1);
-}
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-function init(){
-
-  scene=new THREE.Scene();
-
-  scene.background=
-    new THREE.Color(0x06111d);
-
-  scene.fog=
-    new THREE.Fog(
-      0x102638,
-      .012,
-      900
-    );
-
-
-  camera=
-    new THREE.PerspectiveCamera(
-      65,
-      innerWidth/innerHeight,
-      .1,
-      1500
-    );
-
-  camera.position.set(
-    0,5.1,10
-  );
-
-  camera.rotation.x=-.22;
-
-
-  renderer=
-    new THREE.WebGLRenderer({
-      canvas:
-        document.getElementById("game"),
-      antialias:true
-    });
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio,2)
-  );
-
-  renderer.outputEncoding=
-    THREE.sRGBEncoding;
-
-
-  scene.add(
-    new THREE.HemisphereLight(
-      0x8edcff,
-      0x03070c,
-      1.8
-    )
-  );
-
-
-  const sun=
-    new THREE.DirectionalLight(
-      0xffd0a0,
-      1.7
-    );
-
-  sun.position.set(
-    -80,120,-200
-  );
-
-  scene.add(sun);
-
-
-  buildSky();
-  buildRoad();
-  buildCity();
-  buildStars();
-  buildPlayer();
-
-  setup();
-
-  document.getElementById(
-    "best"
-  ).textContent=
-    best.toLocaleString();
-
-  clock=new THREE.Clock();
-
-  animate();
-}
-
-
-/* =========================================================
-   SKY
-========================================================= */
-
-function buildSky(){
-
-  const sky=
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        700,32,16
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0x18384e,
-        side:THREE.BackSide
-      })
-    );
-
-  scene.add(sky);
-
-
-  const sun=
-    new THREE.Mesh(
-      new THREE.CircleGeometry(
-        45,48
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0xffad58
-      })
-    );
-
-  sun.position.set(
-    -115,85,-430
-  );
-
-  scene.add(sun);
-
-
-  const glow=
-    new THREE.PointLight(
-      0xff9944,
-      5,
-      300
-    );
-
-  glow.position.set(
-    -100,70,-300
-  );
-
-  scene.add(glow);
-}
-
-
-/* =========================================================
-   STARS
-========================================================= */
-
-function buildStars(){
-
-  for(let i=0;i<350;i++){
-
-    const s=
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          .08+Math.random()*.12,
-          5,5
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            Math.random()>.5
-            ?0x8ceeff
-            :0xffffff
-        })
-      );
-
-    s.position.set(
-      (Math.random()-.5)*500,
-      40+Math.random()*220,
-      -100-Math.random()*900
-    );
-
-    scene.add(s);
-
-    stars.push(s);
-  }
-}
-
-
-/* =========================================================
-   ROAD
-========================================================= */
-
-function buildRoad(){
-
-  const road=
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        30,1700
-      ),
-      new THREE.MeshStandardMaterial({
-        color:0x05080d,
-        metalness:.8,
-        roughness:.38
-      })
-    );
-
-  road.rotation.x=-Math.PI/2;
-
-  road.position.z=-700;
-
-  scene.add(road);
-
-
-  [-1,1].forEach(s=>{
-
-    const edge=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .22,.35,1700
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            s<0
-            ?0xff2467
-            :0x20eaff
-        })
-      );
-
-    edge.position.set(
-      s*14,.2,-700
-    );
-
-    scene.add(edge);
-  });
-
-
-  for(
-    let z=-1600;
-    z<100;
-    z+=11
-  ){
-
-    for(
-      let i=-2;
-      i<=2;
-      i++
-    ){
-
-      const m=
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            .11,.04,4.5
-          ),
-          new THREE.MeshBasicMaterial({
-            color:
-              i%2
-              ?0xff3473
-              :0x20dcff
-          })
-        );
-
-      m.position.set(
-        i*laneW+laneW/2,
-        .04,
-        z
-      );
-
-      scene.add(m);
-
-      roadMarks.push(m);
-    }
-  }
-}
-
-
-/* =========================================================
-   CITY
-========================================================= */
-
-function buildCity(){
-
-  for(let i=0;i<130;i++){
-
-    const h=
-      15+Math.random()*150;
-
-    const w=
-      7+Math.random()*22;
-
-    const b=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          w,h,
-          10+Math.random()*25
-        ),
-        new THREE.MeshStandardMaterial({
-          color:
-            Math.random()>.5
-            ?0x07131e
-            :0x0b202d,
-          roughness:1,
-          metalness:.1
-        })
-      );
-
-    const side=
-      Math.random()>.5
-      ?1:-1;
-
-    b.position.set(
-      side*(18+Math.random()*130),
-      h/2,
-      -100-Math.random()*800
-    );
-
-    scene.add(b);
-
-    city.push(b);
-
-
-    if(Math.random()<.5){
-
-      const windows=
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            w*.65,
-            h*.6,
-            .08
-          ),
-          new THREE.MeshBasicMaterial({
-            color:
-              Math.random()>.5
-              ?0x18dfff
-              :0xff4c89
-          })
-        );
-
-      windows.position.set(
-        b.position.x,
-        b.position.y,
-        b.position.z-
-        (side>0?w/2:w/2)
-      );
-
-      scene.add(windows);
-
-      city.push(windows);
-    }
-  }
-
-
-  for(let i=0;i<45;i++){
-
-    const x=
-      (Math.random()-.5)*240;
-
-    const z=
-      -160-Math.random()*700;
-
-    const bar=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          7,.1,.1
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            Math.random()>.5
-            ?0x35eaff
-            :0xff4d83
-        })
-      );
-
-    bar.position.set(
-      x,
-      10+Math.random()*100,
-      z
-    );
-
-    scene.add(bar);
-
-    city.push(bar);
-  }
-}
-
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-function buildPlayer(){
-
-  if(player)
-    scene.remove(player);
-
-
-  player=new THREE.Group();
-
-
-  const bodyMat=
-    new THREE.MeshStandardMaterial({
-      color:0x13dff0,
-      metalness:.95,
-      roughness:.12,
-      emissive:0x0bd9ff,
-      emissiveIntensity:.08
-    });
-
-
-  const dark=
-    new THREE.MeshStandardMaterial({
-      color:0x03070b,
-      metalness:.9,
-      roughness:.08
-    });
-
-
-  const glass=
-    new THREE.MeshStandardMaterial({
-      color:0x102d3b,
-      metalness:.85,
-      roughness:.02
-    });
-
-
-  function add(
-    geo,
-    mat,
-    pos,
-    rot
-  ){
-
-    const m=
-      new THREE.Mesh(
-        geo,
-        mat
-      );
-
-    m.position.set(...pos);
-
-    if(rot)
-      m.rotation.set(...rot);
-
-    player.add(m);
-
-    return m;
-  }
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.5,.55,4.8
-    ),
-    bodyMat,
-    [0,.62,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.15,.34,1.2
-    ),
-    bodyMat,
-    [0,.74,-2.62]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.7,.5,2.05
-    ),
-    dark,
-    [0,1.05,.05]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.5,.34,.12
-    ),
-    glass,
-    [0,1.18,-.92],
-    [-.25,0,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.5,.30,.12
-    ),
-    glass,
-    [0,1.17,1.02],
-    [.22,0,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.25,.11,.55
-    ),
-    bodyMat,
-    [0,1.43,1.95]
-  );
-
-
-  [-.72,.72].forEach(x=>{
-
-    add(
-      new THREE.BoxGeometry(
-        .48,.12,.14
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0xeaffff
-      }),
-      [x,.73,-3.18]
-    );
-
-  });
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.15,.12,.14
-    ),
-    new THREE.MeshBasicMaterial({
-      color:0xff174f
-    }),
-    [0,.76,2.43]
-  );
-
-
-  [-1,1].forEach(s=>{
-
-    add(
-      new THREE.BoxGeometry(
-        .13,.4,2.8
-      ),
-      bodyMat,
-      [s*1.2,.72,0]
-    );
-
-  });
-
-
-  const tireMat=
-    new THREE.MeshStandardMaterial({
-      color:0x010203,
-      roughness:.3,
-      metalness:.6
-    });
-
-
-  const rimMat=
-    new THREE.MeshBasicMaterial({
-      color:0x1769ff
-    });
-
-
-  [
-    [-1.27,.44,-1.55],
-    [1.27,.44,-1.55],
-    [-1.27,.44,1.55],
-    [1.27,.44,1.55]
-  ].forEach(p=>{
-
-    const g=new THREE.Group();
-
-    g.position.set(...p);
-
-
-    const tire=
-      new THREE.Mesh(
-        new THREE.CylinderGeometry(
-          .48,.48,.34,20
-        ),
-        tireMat
-      );
-
-    tire.rotation.z=
-      Math.PI/2;
-
-    g.add(tire);
-
-
-    const rim=
-      new THREE.Mesh(
-        new THREE.TorusGeometry(
-          .29,.055,8,18
-        ),
-        rimMat
-      );
-
-    rim.rotation.y=
-      Math.PI/2;
-
-    g.add(rim);
-
-    player.add(g);
-  });
-
-
-  const glow=
-    new THREE.PointLight(
-      0x10dfff,
-      5,
-      18
-    );
-
-  glow.position.y=.25;
-
-  player.add(glow);
-
-
-  shieldMesh=
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        3,24,24
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0x25dfff,
-        wireframe:true,
-        transparent:true,
-        opacity:.2
-      })
-    );
-
-  shieldMesh.position.y=.8;
-
-  player.add(shieldMesh);
-
-
-  /* Nitro flames */
-
-  for(
-    let x of [-.65,.65]
-  ){
-
-    const flame=
-      new THREE.Mesh(
-        new THREE.ConeGeometry(
-          .22,.9,8
-        ),
-        new THREE.MeshBasicMaterial({
-          color:0x18eaff,
-          transparent:true,
-          opacity:.8
-        })
-      );
-
-    flame.rotation.x=
-      -Math.PI/2;
-
-    flame.position.set(
-      x,.55,2.75
-    );
-
-    flame.visible=false;
-
-    player.add(flame);
-  }
-
-
-  player.position.set(
-    0,0,3
-  );
-
-  scene.add(player);
-}
-
-
-/* =========================================================
-   TRAFFIC
-========================================================= */
-
-function spawnTraffic(){
-
-  const l=
-    Math.floor(Math.random()*5)-2;
-
-
-  const g=
-    new THREE.Group();
-
-
-  const isPolice=
-    police &&
-    Math.random()<.65;
-
-
-  const truck=
-    !isPolice &&
-    Math.random()<.16;
-
-
-  const col=[
-    0xff315f,
-    0x00d084,
-    0xffb300,
-    0x7c4dff,
-    0x26d9ff
-  ][
-    Math.floor(
-      Math.random()*5
-    )
-  ];
-
-
-  const mat=
-    new THREE.MeshStandardMaterial({
-      color:
-        isPolice
-        ?0x11151d
-        :col,
-      metalness:.85,
-      roughness:.18
-    });
-
-
-  if(truck){
-
-    const cab=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.55,1.65,2.8
-        ),
-        mat
-      );
-
-    cab.position.set(
-      0,1.05,-1.8
-    );
-
-    g.add(cab);
-
-
-    const box=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.7,2.25,4.6
-        ),
-        new THREE.MeshStandardMaterial({
-          color:0x222a34,
-          metalness:.4
-        })
-      );
-
-    box.position.set(
-      0,1.35,1.5
-    );
-
-    g.add(box);
-
-  }else{
-
-    const b=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.2,.8,4.3
-        ),
-        mat
-      );
-
-    b.position.y=.55;
-
-    g.add(b);
-
-
-    if(isPolice){
-
-      const bar=
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            1.5,.16,.35
-          ),
-          new THREE.MeshBasicMaterial({
-            color:0xff174f
-          })
-        );
-
-      bar.position.y=1.15;
-
-      g.add(bar);
-
-
-      const blue=
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            .55,.13,.2
-          ),
-          new THREE.MeshBasicMaterial({
-            color:0x16bfff
-          })
-        );
-
-      blue.position.set(
-        .45,1.16,0
-      );
-
-      g.add(blue);
-    }
-  }
-
-
-  g.position.set(
-    l*laneW,
-    0,
-    -235-Math.random()*35
-  );
-
-  scene.add(g);
-
-
-  traffic.push({
-    g,
-    l,
-    speed:
-      isPolice
-      ?120+Math.random()*80
-      :100+Math.random()*75,
-    police:isPolice,
-    passed:false
-  });
-}
-
-
-/* =========================================================
-   PICKUPS
-========================================================= */
-
-function spawnPickup(){
-
-  const l=
-    Math.floor(Math.random()*5)-2;
-
-
-  const g=
-    new THREE.Group();
-
-
-  const r=Math.random();
-
-
-  const type=
-    r<.38
-    ?"nitro"
-    :r<.68
-    ?"shield"
-    :r<.88
-    ?"credit"
-    :"xp";
-
-
-  const color=
-    type==="nitro"
-    ?0x20eaff
-    :type==="shield"
-    ?0x4c7dff
-    :type==="credit"
-    ?0xffd21f
-    :0xc44dff;
-
-
-  const mesh=
-    new THREE.Mesh(
-      new THREE.OctahedronGeometry(.8),
-      new THREE.MeshBasicMaterial({
-        color,
-        wireframe:type==="nitro"
-      })
-    );
-
-
-  g.add(mesh);
-
-
-  const light=
-    new THREE.PointLight(
-      color,
-      2,
-      7
-    );
-
-  g.add(light);
-
-
-  g.position.set(
-    l*laneW,
-    1.2,
-    -235
-  );
-
-  scene.add(g);
-
-
-  pickups.push({
-    g,
-    type
-  });
-}
-
-
-/* =========================================================
-   PARTICLES
-========================================================= */
-
-function particle(
-  pos,
-  color=0x20eaff,
-  count=8
-){
-
-  for(let i=0;i<count;i++){
-
-    const p=
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          .04+Math.random()*.09,
-          5,5
-        ),
-        new THREE.MeshBasicMaterial({
-          color,
-          transparent:true
-        })
-      );
-
-    p.position.copy(pos);
-
-    p.position.x+=
-      (Math.random()-.5)*1.2;
-
-    p.position.y+=
-      Math.random()*.8;
-
-    p.position.z+=
-      (Math.random()-.5)*1.2;
-
-    scene.add(p);
-
-    particles.push({
-      mesh:p,
-      life:.4+Math.random()*.6,
-      vx:(Math.random()-.5)*2,
-      vy:Math.random()*2,
-      vz:Math.random()*2
-    });
-  }
-}
-
-
-/* =========================================================
-   INPUT
-========================================================= */
-
-function setup(){
-
-  addEventListener(
-    "resize",
-    resize
-  );
-
-
-  addEventListener(
-    "keydown",
-    e=>{
-
-      const k=
-        e.key.toLowerCase();
-
-
-      if(
-        e.key==="ArrowLeft" ||
-        k==="a"
-      )
-        left();
-
-
-      if(
-        e.key==="ArrowRight" ||
-        k==="d"
-      )
-        right();
-
-
-      if(
-        e.key==="ArrowUp" ||
-        k==="w" ||
-        e.key==="Shift"
-      )
-        setBoost(true);
-
-
-      if(
-        e.key==="Escape" ||
-        e.key===" "
-      ){
-
-        e.preventDefault();
-
-        pauseGame();
-      }
-    }
-  );
-
-
-  addEventListener(
-    "keyup",
-    e=>{
-
-      if(
-        e.key==="ArrowUp" ||
-        e.key.toLowerCase()==="w" ||
-        e.key==="Shift"
-      )
-        setBoost(false);
-    }
-  );
-
-
-  document.getElementById(
-    "left"
-  ).onpointerdown=
-    ()=>{
-      left();
-      vibrate(15);
-    };
-
-
-  document.getElementById(
-    "right"
-  ).onpointerdown=
-    ()=>{
-      right();
-      vibrate(15);
-    };
-
-
-  const b=
-    document.getElementById("boost");
-
-
-  b.onpointerdown=
-    ()=>{
-      setBoost(true);
-      vibrate(10);
-    };
-
-
-  b.onpointerup=
-    ()=>setBoost(false);
-
-
-  b.onpointercancel=
-    ()=>setBoost(false);
-
-
-  let sx=0;
-
-
-  addEventListener(
-    "touchstart",
-    e=>{
-
-      if(e.touches[0])
-        sx=e.touches[0].clientX;
-
-    },
-    {passive:true}
-  );
-
-
-  addEventListener(
-    "touchend",
-    e=>{
-
-      if(!running || paused)
-        return;
-
-
-      const dx=
-        e.changedTouches[0].clientX-sx;
-
-
-      if(Math.abs(dx)>45){
-
-        dx<0
-        ?left()
-        :right();
-
-        vibrate(10);
+  <script>
+    /* =========================================================
+       AUDIO SYSTEM (WEB AUDIO API SYNTHESIZER)
+       ========================================================= */
+    class CyberSoundSystem {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = localStorage.getItem('np_muted') === 'true';
+        this.engineOsc = null;
+        this.engineFilter = null;
+        this.engineGain = null;
+        this.musicTimer = null;
+        this.musicStep = 0;
       }
 
-    },
-    {passive:true}
-  );
-}
-
-
-function vibrate(ms){
-
-  if(
-    navigator.vibrate &&
-    running
-  )
-    navigator.vibrate(ms);
-}
-
-
-function left(){
-
-  if(running&&!paused){
-
-    lane=
-      Math.max(
-        -2,
-        lane-1
-      );
-
-    targetX=
-      lane*laneW;
-
-    beep(260,.04,"square");
-  }
-}
-
-
-function right(){
-
-  if(running&&!paused){
-
-    lane=
-      Math.min(
-        2,
-        lane+1
-      );
-
-    targetX=
-      lane*laneW;
-
-    beep(320,.04,"square");
-  }
-}
-
-
-function setBoost(v){
-
-  if(!running||paused){
-
-    boost=false;
-
-    return;
-  }
-
-  boost=
-    v &&
-    nitro>3;
-}
-
-
-/* =========================================================
-   GAME START
-========================================================= */
-
-function startGame(){
-
-  audio();
-
-  [
-    "menu",
-    "over",
-    "pause"
-  ].forEach(id=>
-    document
-      .getElementById(id)
-      .classList.add("hidden")
-  );
-
-
-  document.getElementById(
-    "hud"
-  ).classList.remove("hidden");
-
-
-  document.getElementById(
-    "mobile"
-  ).classList.remove("hidden");
-
-
-  traffic.forEach(
-    x=>scene.remove(x.g)
-  );
-
-  traffic=[];
-
-
-  pickups.forEach(
-    x=>scene.remove(x.g)
-  );
-
-  pickups=[];
-
-
-  particles.forEach(
-    x=>scene.remove(x.mesh)
-  );
-
-  particles=[];
-
-
-  lane=0;
-  targetX=0;
-
-  score=0;
-  distance=0;
-
-  nitro=100;
-  shield=1;
-
-  speed=155;
-  maxSpeed=155;
-
-  spawn=0;
-  pickupSpawn=0;
-
-  policeTimer=0;
-  police=false;
-
-  boost=false;
-
-  level=1;
-  xp=0;
-  xpNeed=100;
-
-  combo=1;
-  comboTimer=0;
-
-  missionType=
-    ["distance","near","collect"]
-    [Math.floor(Math.random()*3)];
-
-  missionTarget=
-    missionType==="distance"
-    ?500
-    :missionType==="near"
-    ?5
-    :3;
-
-  missionProgress=0;
-
-  running=true;
-  paused=false;
-
-
-  player.position.set(
-    0,0,3
-  );
-
-
-  shieldMesh.visible=true;
-
-  updateMission();
-
-  updateHud();
-
-  beep(500,.12,"sawtooth");
-  beep(800,.15,"square");
-}
-
-
-/* =========================================================
-   PAUSE / HOME
-========================================================= */
-
-function pauseGame(){
-
-  if(!running)
-    return;
-
-
-  paused=!paused;
-
-
-  document
-    .getElementById("pause")
-    .classList.toggle(
-      "hidden",
-      !paused
-    );
-
-
-  if(paused)
-    boost=false;
-}
-
-
-function goHome(){
-
-  running=false;
-  paused=false;
-  boost=false;
-
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("mobile")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("pause")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("over")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("menu")
-    .classList.remove("hidden");
-}
-
-
-/* =========================================================
-   CRASH
-========================================================= */
-
-function crash(){
-
-  if(!running)
-    return;
-
-
-  if(shield>0){
-
-    shield--;
-
-    shieldMesh.visible=false;
-
-    shake=.8;
-
-    particle(
-      player.position,
-      0x20eaff,
-      25
-    );
-
-    beep(120,.25,"sawtooth");
-
-    vibrate(100);
-
-    return;
-  }
-
-
-  running=false;
-
-  boost=false;
-
-  shake=1.4;
-
-
-  particle(
-    player.position,
-    0xff365f,
-    55
-  );
-
-
-  beep(70,.5,"sawtooth");
-
-  vibrate(250);
-
-
-  const final=
-    Math.floor(score);
-
-
-  if(final>best){
-
-    best=final;
-
-    localStorage.setItem(
-      bestKey,
-      best
-    );
-  }
-
-
-  document.getElementById(
-    "finalScore"
-  ).textContent=
-    final.toLocaleString();
-
-
-  document.getElementById(
-    "finalDistance"
-  ).textContent=
-    Math.floor(distance)+" M";
-
-
-  document.getElementById(
-    "finalSpeed"
-  ).textContent=
-    Math.floor(maxSpeed)+" KM/H";
-
-
-  document.getElementById(
-    "finalLevel"
-  ).textContent=
-    level;
-
-
-  document.getElementById(
-    "best"
-  ).textContent=
-    best.toLocaleString();
-
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("mobile")
-    .classList.add("hidden");
-
-
-  setTimeout(
-    ()=>{
-      document
-        .getElementById("over")
-        .classList.remove("hidden");
-    },
-    650
-  );
-}
-
-
-/* =========================================================
-   LEVEL / XP
-========================================================= */
-
-function addXP(amount){
-
-  xp+=amount;
-
-  while(xp>=xpNeed){
-
-    xp-=xpNeed;
-
-    level++;
-
-    xpNeed=
-      Math.floor(
-        100+
-        level*45
-      );
-
-    score+=1000;
-
-    document.getElementById(
-      "levelFlash"
-    ).classList.remove("show");
-
-    void document.getElementById(
-      "levelFlash"
-    ).offsetWidth;
-
-    document.getElementById(
-      "levelFlash"
-    ).classList.add("show");
-
-    beep(500,.1);
-    beep(800,.15);
-    beep(1200,.2);
-
-    vibrate(80);
-  }
-}
-
-
-/* =========================================================
-   MISSION
-========================================================= */
-
-function updateMission(){
-
-  let text="";
-
-  if(missionType==="distance"){
-
-    text=
-      "Drive "+
-      Math.floor(missionProgress)+
-      " / "+
-      missionTarget+
-      " M";
-
-  }else if(missionType==="near"){
-
-    text=
-      "Near misses "+
-      missionProgress+
-      " / "+
-      missionTarget;
-
-  }else{
-
-    text=
-      "Collect "+
-      missionProgress+
-      " / "+
-      missionTarget+
-      " energy";
-  }
-
-
-  document.getElementById(
-    "missionText"
-  ).textContent=text;
-}
-
-
-function completeMission(){
-
-  score+=1500;
-
-  addXP(80);
-
-  nitro=100;
-
-  shield=
-    Math.min(
-      2,
-      shield+1
-    );
-
-  missionType=
-    ["distance","near","collect"]
-    [Math.floor(Math.random()*3)];
-
-  missionTarget=
-    missionType==="distance"
-    ?700+level*100
-    :missionType==="near"
-    ?5+Math.floor(level/2)
-    :3+Math.floor(level/2);
-
-  missionProgress=0;
-
-  updateMission();
-
-  beep(700,.1);
-  beep(1000,.1);
-  beep(1400,.2);
-
-  vibrate(120);
-}
-
-
-/* =========================================================
-   MAIN UPDATE
-========================================================= */
-
-function update(dt){
-
-  const difficulty=
-    Math.min(
-      2.7,
-      1+distance/2600
-    );
-
-
-  const target=
-    265*
-    (.68+.32*difficulty)
-    +
-    (boost?105:0);
-
-
-  if(boost){
-
-    nitro=
-      Math.max(
-        0,
-        nitro-dt*38
-      );
-
-
-    if(nitro<=0)
-      boost=false;
-
-  }else{
-
-    nitro=
-      Math.min(
-        100,
-        nitro+dt*2.5
-      );
-  }
-
-
-  speed+=
-    (target-speed)*
-    Math.min(
-      1,
-      dt*(boost?5:2.1)
-    );
-
-
-  maxSpeed=
-    Math.max(
-      maxSpeed,
-      speed
-    );
-
-
-  distance+=
-    speed*.22*dt;
-
-
-  score+=
-    speed*.13*dt*
-    combo*
-    (boost?2.15:1);
-
-
-  addXP(
-    speed*.004*dt
-  );
-
-
-  if(
-    missionType==="distance"
-  ){
-
-    missionProgress=
-      Math.floor(distance);
-
-  }
-
-
-  if(
-    missionProgress>=missionTarget
-  )
-    completeMission();
-
-
-  comboTimer-=dt;
-
-
-  if(comboTimer<=0){
-
-    combo=
-      Math.max(
-        1,
-        combo-dt*.5
-      );
-  }
-
-
-  policeTimer+=dt;
-
-
-  if(
-    !police &&
-    policeTimer>16+level*1.2
-  ){
-
-    police=true;
-
-    policeTimer=0;
-
-    beep(900,.12,"square");
-    beep(650,.15,"square");
-  }
-
-
-  if(
-    police &&
-    policeTimer>18
-  ){
-
-    police=false;
-
-    policeTimer=0;
-  }
-
-
-  player.position.x+=
-    (targetX-player.position.x)*
-    Math.min(
-      1,
-      dt*13
-    );
-
-
-  player.rotation.z=
-    -(targetX-player.position.x)*
-    .055;
-
-
-  camera.position.x+=
-    (
-      player.position.x*.25-
-      camera.position.x
-    )*
-    dt*8;
-
-
-  camera.fov+=
-    (
-      (boost?80:65)-
-      camera.fov
-    )*
-    dt*5;
-
-
-  camera.updateProjectionMatrix();
-
-
-  if(shake>0){
-
-    camera.position.y=
-      5.1+
-      (Math.random()-.5)*
-      shake;
-
-    camera.position.x+=
-      (Math.random()-.5)*
-      shake;
-
-    shake=
-      Math.max(
-        0,
-        shake-dt*2.4
-      );
-
-  }else{
-
-    camera.position.y=5.1;
-  }
-
-
-  /* Nitro flame */
-
-  player.children.forEach(
-    c=>{
-
-      if(
-        c.geometry &&
-        c.geometry.type==="ConeGeometry"
-      ){
-
-        c.visible=boost;
-
-        if(boost)
-          c.scale.y=
-            .7+Math.random()*1.2;
+      init() {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) this.ctx = new AC();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
       }
 
-    }
-  );
-
-
-  /* Road */
-
-  const move=
-    (speed*.055+10)*dt;
-
-
-  roadMarks.forEach(m=>{
-
-    m.position.z+=move;
-
-    if(m.position.z>25)
-      m.position.z-=1600;
-  });
-
-
-  city.forEach(b=>{
-
-    b.position.z+=move*.75;
-
-    if(b.position.z>90)
-      b.position.z-=850;
-  });
-
-
-  stars.forEach(s=>{
-
-    s.position.z+=move*.25;
-
-    if(s.position.z>80)
-      s.position.z-=1000;
-  });
-
-
-  /* Spawn */
-
-  spawn+=dt;
-
-  pickupSpawn+=dt;
-
-
-  const interval=
-    Math.max(
-      .23,
-      .82-distance/5600
-    );
-
-
-  if(spawn>interval){
-
-    spawnTraffic();
-
-    spawn=0;
-  }
-
-
-  if(pickupSpawn>3.4){
-
-    spawnPickup();
-
-    pickupSpawn=0;
-  }
-
-
-  /* Traffic */
-
-  for(
-    let i=traffic.length-1;
-    i>=0;
-    i--
-  ){
-
-    const t=
-      traffic[i];
-
-
-    t.g.position.z+=
-      (
-        (speed-t.speed)*.045+
-        8+
-        distance*.0007
-      )*dt;
-
-
-    if(t.police){
-
-      t.g.position.x+=
-        Math.sin(
-          performance.now()*.004
-        )*.002;
-    }
-
-
-    const cx=
-      Math.abs(
-        player.position.x-
-        t.g.position.x
-      );
-
-
-    const cz=
-      Math.abs(
-        player.position.z-
-        t.g.position.z
-      );
-
-
-    if(
-      !t.passed &&
-      t.g.position.z>
-      player.position.z-1.8
-    ){
-
-      t.passed=true;
-
-
-      if(
-        cx>1.7 &&
-        cx<3.1
-      ){
-
-        score+=
-          Math.floor(
-            350*combo
-          );
-
-        combo=
-          Math.min(
-            8,
-            combo+.5
-          );
-
-        comboTimer=3;
-
-        missionType==="near" &&
-          missionProgress++;
-
-        addXP(12);
-
-        particle(
-          player.position,
-          0xffd21f,
-          8
-        );
-
-        beep(600,.04,"square");
-      }
-    }
-
-
-    if(
-      cx<2.12 &&
-      cz<4.0
-    ){
-
-      crash();
-
-      break;
-    }
-
-
-    if(
-      t.g.position.z>30
-    ){
-
-      scene.remove(t.g);
-
-      traffic.splice(i,1);
-    }
-  }
-
-
-  /* Pickups */
-
-  for(
-    let i=pickups.length-1;
-    i>=0;
-    i--
-  ){
-
-    const p=
-      pickups[i];
-
-
-    p.g.position.z+=move;
-
-    p.g.rotation.y+=dt*3;
-
-    p.g.rotation.x+=dt;
-
-
-    if(
-      player.position.distanceTo(
-        p.g.position
-      )<2.5
-    ){
-
-      if(p.type==="nitro"){
-
-        nitro=100;
-
-        score+=250;
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        localStorage.setItem('np_muted', this.isMuted);
+        if (this.isMuted) {
+          this.stopEngine();
+          this.stopMusic();
+        } else {
+          this.init();
+          if (running && !paused) {
+            this.startEngine();
+            this.startMusic();
+          }
+        }
+        return this.isMuted;
       }
 
+      startEngine() {
+        this.init();
+        if (this.isMuted || !this.ctx || this.engineOsc) return;
 
-      if(p.type==="shield"){
+        try {
+          const now = this.ctx.currentTime;
+          this.engineOsc = this.ctx.createOscillator();
+          this.engineFilter = this.ctx.createBiquadFilter();
+          this.engineGain = this.ctx.createGain();
 
-        shield=
-          Math.min(
-            2,
-            shield+1
-          );
+          this.engineOsc.type = 'sawtooth';
+          this.engineOsc.frequency.setValueAtTime(55, now);
 
-        shieldMesh.visible=true;
+          this.engineFilter.type = 'lowpass';
+          this.engineFilter.frequency.setValueAtTime(360, now);
+          this.engineGain.gain.setValueAtTime(0.06, now);
 
-        score+=350;
+          this.engineOsc.connect(this.engineFilter).connect(this.engineGain).connect(this.ctx.destination);
+          this.engineOsc.start(now);
+        } catch(e) {}
       }
 
-
-      if(p.type==="credit"){
-
-        score+=750;
+      updateEngine(ratio, boosting) {
+        if (!this.engineOsc || !this.ctx || this.isMuted) return;
+        try {
+          const now = this.ctx.currentTime;
+          const targetFreq = 50 + ratio * 140 + (boosting ? 50 : 0);
+          this.engineOsc.frequency.setTargetAtTime(targetFreq, now, 0.08);
+          if (this.engineFilter) {
+            this.engineFilter.frequency.setTargetAtTime(320 + ratio * 450 + (boosting ? 200 : 0), now, 0.08);
+          }
+        } catch(e) {}
       }
 
-
-      if(p.type==="xp"){
-
-        addXP(40);
-
-        score+=300;
+      stopEngine() {
+        if (this.engineOsc) {
+          try {
+            this.engineOsc.stop();
+            this.engineOsc.disconnect();
+          } catch(e) {}
+          this.engineOsc = null;
+        }
       }
 
-
-      if(
-        missionType==="collect"
-      )
-        missionProgress++;
-
-
-      particle(
-        p.g.position,
-        p.type==="credit"
-        ?0xffd21f
-        :p.type==="shield"
-        ?0x4c7dff
-        :0x20eaff,
-        16
-      );
-
-
-      beep(900,.08);
-      beep(1300,.1);
-
-      scene.remove(p.g);
-
-      pickups.splice(i,1);
-
-      continue;
-    }
-
-
-    if(
-      p.g.position.z>30
-    ){
-
-      scene.remove(p.g);
-
-      pickups.splice(i,1);
-    }
-  }
-
-
-  /* Particles */
-
-  for(
-    let i=particles.length-1;
-    i>=0;
-    i--
-  ){
-
-    const p=
-      particles[i];
-
-    p.life-=dt;
-
-    p.mesh.position.x+=
-      p.vx*dt;
-
-    p.mesh.position.y+=
-      p.vy*dt;
-
-    p.mesh.position.z+=
-      p.vz*dt;
-
-    p.mesh.material.opacity=
-      Math.max(
-        0,
-        p.life
-      );
-
-    if(p.life<=0){
-
-      scene.remove(p.mesh);
-
-      particles.splice(i,1);
-    }
-  }
-
-
-  updateHud();
-}
-
-
-/* =========================================================
-   HUD
-========================================================= */
-
-function updateHud(){
-
-  document.getElementById(
-    "speed"
-  ).textContent=
-    Math.floor(speed);
-
-
-  document.getElementById(
-    "score"
-  ).textContent=
-    Math.floor(score)
-    .toLocaleString();
-
-
-  document.getElementById(
-    "distance"
-  ).textContent=
-    Math.floor(distance)+" M";
-
-
-  document.getElementById(
-    "nitro"
-  ).textContent=
-    Math.floor(nitro)+"%";
-
-
-  document.getElementById(
-    "nitrobar"
-  ).style.width=
-    Math.floor(nitro)+"%";
-
-
-  document.getElementById(
-    "shield"
-  ).textContent=
-    shield>0
-    ?"●".repeat(shield)
-    :"EMPTY";
-
-
-  document.getElementById(
-    "shieldbar"
-  ).style.width=
-    Math.min(
-      100,
-      shield*50
-    )+"%";
-
-
-  document.getElementById(
-    "combo"
-  ).textContent=
-    "x"+combo.toFixed(1);
-
-
-  document.getElementById(
-    "combobar"
-  ).style.width=
-    Math.min(
-      100,
-      comboTimer/3*100
-    )+"%";
-
-
-  document.getElementById(
-    "level"
-  ).textContent=
-    level;
-
-
-  document.getElementById(
-    "xpText"
-  ).textContent=
-    Math.floor(xp)+
-    " / "+
-    xpNeed;
-
-
-  document.getElementById(
-    "xpbar"
-  ).style.width=
-    Math.min(
-      100,
-      xp/xpNeed*100
-    )+"%";
-
-
-  document.getElementById(
-    "police"
-  ).classList.toggle(
-    "hidden",
-    !police
-  );
-
-
-  updateMission();
-}
-
-
-/* =========================================================
-   ANIMATION
-========================================================= */
-
-function animate(){
-
-  requestAnimationFrame(
-    animate
-  );
-
-
-  const dt=
-    Math.min(
-      clock.getDelta(),
-      .05
-    );
-
-
-  if(
-    running &&
-    !paused
-  )
-    update(dt);
-
-
-  renderer.render(
-    scene,
-    camera
-  );
-}
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-function resize(){
-
-  camera.aspect=
-    innerWidth/innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-document.getElementById(
-  "best"
-).textContent=
-  best.toLocaleString();
-
-
-init();
-
-</script>
-
-</body>
-</html> html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>NEON PURSUIT 3D — STREET HUNTER</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
-  -webkit-user-select:none
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#050b12;
-  color:#fff;
-  font-family:Arial,sans-serif;
-  touch-action:none
-}
-
-canvas{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block
-}
-
-#ui{
-  position:fixed;
-  inset:0;
-  z-index:5;
-  pointer-events:none
-}
-
-.auto{
-  pointer-events:auto
-}
-
-.panel{
-  background:rgba(5,10,18,.82);
-  border:1px solid rgba(80,220,255,.35);
-  backdrop-filter:blur(14px);
-  box-shadow:0 0 35px rgba(0,220,255,.12)
-}
-
-.hidden{
-  display:none!important
-}
-
-.glow{
-  box-shadow:0 0 20px rgba(0,220,255,.35)
-}
-
-@keyframes pulse{
-  50%{
-    box-shadow:0 0 35px rgba(255,60,100,.65)
-  }
-}
-
-.danger{
-  animation:pulse .8s infinite
-}
-</style>
-</head>
-
-<body>
-
-<canvas id="game"></canvas>
-
-<div id="ui">
-
-<!-- HUD -->
-<div id="hud" class="hidden absolute top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl">
-
-  <div class="panel rounded-2xl px-3 py-2 flex items-center justify-between gap-3">
-
-    <div>
-      <div class="text-[9px] text-cyan-300 tracking-widest">SPEED</div>
-      <b id="speed" class="text-xl text-cyan-200">0</b>
-      <small>KM/H</small>
-    </div>
-
-    <div class="text-center">
-      <div class="text-[9px] text-pink-300 tracking-widest">SCORE</div>
-      <b id="score" class="text-xl text-pink-200">0</b>
-    </div>
-
-    <div class="hidden sm:block text-center">
-      <div class="text-[9px] text-amber-300 tracking-widest">DISTANCE</div>
-      <b id="distance">0 M</b>
-    </div>
-
-    <div id="police"
-         class="hidden danger px-3 py-1 rounded-full border border-red-400 bg-red-900/40 text-red-200 text-xs font-bold">
-      🚨 PURSUIT
-    </div>
-
-    <button
-      class="auto p-2 rounded-xl bg-slate-900 border border-cyan-500/30"
-      onclick="pauseGame()">
-      ⏸
-    </button>
-
-  </div>
-
-  <div class="flex justify-between mt-2">
-
-    <div class="panel rounded-xl px-3 py-1.5 text-xs">
-      NITRO
-      <span id="nitro">100%</span>
-
-      <div class="w-32 sm:w-52 h-2 bg-black/70 rounded overflow-hidden">
-        <div
-          id="nitrobar"
-          class="h-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500"
-          style="width:100%">
-        </div>
-      </div>
-    </div>
-
-    <div class="panel rounded-xl px-3 py-1.5 text-xs">
-      SHIELD
-      <span id="shield">●</span>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- MAIN MENU -->
-<div id="menu"
-     class="absolute inset-0 flex items-center justify-center p-4 bg-black/20">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-md text-center">
-
-    <div class="text-[10px] tracking-[4px] text-cyan-300">
-      NEO CITY // HIGHWAY 09
-    </div>
-
-    <h1 class="text-4xl sm:text-5xl font-black mt-2 text-cyan-200">
-      NEON
-      <span class="text-pink-400">PURSUIT</span>
-    </h1>
-
-    <p class="text-slate-300 text-sm mt-2">
-      Street Hunter — Hardcore Interception
-    </p>
-
-    <div class="mt-5 rounded-2xl bg-black/40 border border-slate-700 p-4 text-left">
-
-      <div class="text-xs text-cyan-300">
-        VEHICLE
-      </div>
-
-      <b id="carName">
-        PHANTOM GT-99
-      </b>
-
-      <p class="text-xs text-slate-400 mt-1">
-        Original fictional hypercar • no real-world model
-      </p>
-
-    </div>
-
-    <button
-      class="auto glow w-full mt-5 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 text-black font-black"
-      onclick="startGame()">
-      🚀 LAUNCH
-    </button>
-
-    <div class="grid grid-cols-2 gap-3 mt-3">
-
-      <div class="rounded-xl bg-black/40 border border-slate-700 p-3">
-        <small>BEST</small>
-        <div id="best" class="font-bold">0</div>
-      </div>
-
-      <div class="rounded-xl bg-black/40 border border-slate-700 p-3">
-        <small>CONTROLS</small>
-        <div class="text-xs">
-          A/D • ←/→ • Swipe • Nitro
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-
-<!-- PAUSE -->
-<div id="pause"
-     class="hidden absolute inset-0 flex items-center justify-center bg-black/55 backdrop-blur-sm">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-xs text-center">
-
-    <h2 class="text-2xl font-black text-cyan-200">
-      PAUSED
-    </h2>
-
-    <button
-      class="auto w-full mt-5 py-3 rounded-xl bg-cyan-400 text-black font-bold"
-      onclick="pauseGame()">
-      RESUME
-    </button>
-
-    <button
-      class="auto w-full mt-2 py-3 rounded-xl bg-slate-900 border border-slate-700"
-      onclick="goHome()">
-      MENU
-    </button>
-
-  </div>
-</div>
-
-
-<!-- GAME OVER -->
-<div id="over"
-     class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-md text-center">
-
-    <div class="text-5xl">💥</div>
-
-    <h2 class="text-2xl font-black text-red-400 mt-2">
-      CRASH DETECTED
-    </h2>
-
-    <div class="mt-4 space-y-2 text-sm text-left bg-black/40 rounded-2xl p-4">
-
-      <div class="flex justify-between">
-        <span>SCORE</span>
-        <b id="finalScore">0</b>
-      </div>
-
-      <div class="flex justify-between">
-        <span>DISTANCE</span>
-        <b id="finalDistance">0 M</b>
-      </div>
-
-      <div class="flex justify-between">
-        <span>MAX SPEED</span>
-        <b id="finalSpeed">0 KM/H</b>
-      </div>
-
-    </div>
-
-    <button
-      class="auto w-full mt-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-pink-500 text-black font-black"
-      onclick="startGame()">
-      🔄 RACE AGAIN
-    </button>
-
-    <button
-      class="auto w-full mt-2 py-3 rounded-2xl bg-slate-900 border border-slate-700"
-      onclick="goHome()">
-      MAIN MENU
-    </button>
-
-  </div>
-</div>
-
-
-<!-- MOBILE CONTROLS -->
-<div id="mobile"
-     class="hidden absolute bottom-4 left-0 right-0 px-4 flex justify-between items-end">
-
-  <div class="flex gap-3 auto">
-
-    <button
-      id="left"
-      class="w-16 h-16 rounded-2xl bg-black/65 border-2 border-cyan-400 text-2xl">
-      ◀
-    </button>
-
-    <button
-      id="right"
-      class="w-16 h-16 rounded-2xl bg-black/65 border-2 border-pink-400 text-2xl">
-      ▶
-    </button>
-
-  </div>
-
-  <button
-    id="boost"
-    class="auto w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-500 to-pink-500 border-2 border-white font-black">
-    🔥
-    <br>
-    <small>NITRO</small>
-  </button>
-
-</div>
-
-</div>
-
-
-<script>
-
-let scene;
-let camera;
-let renderer;
-let clock;
-
-let player;
-let shieldMesh;
-
-let traffic=[];
-let pickups=[];
-let roadMarks=[];
-let city=[];
-
-let running=false;
-let paused=false;
-let boost=false;
-
-let lane=0;
-let targetX=0;
-
-let score=0;
-let distance=0;
-
-let speed=155;
-let maxSpeed=155;
-
-let nitro=100;
-let shield=1;
-
-let spawn=0;
-let pickupSpawn=0;
-
-let policeTimer=0;
-let police=false;
-
-let shake=0;
-
-const laneW=3.15;
-
-const bestKey="neon_pursuit_best";
-
-let best=Number(localStorage.getItem(bestKey)||0);
-
-
-const CARS=[{
-
-  name:"PHANTOM GT-99",
-
-  color:0x10dff0,
-
-  accent:0x1769ff,
-
-  top:265,
-
-  nitro:105
-
-}];
-
-
-function init(){
-
-  scene=new THREE.Scene();
-
-  scene.background=new THREE.Color(0x091521);
-
-  scene.fog=new THREE.Fog(0x102434,.012);
-
-
-  camera=new THREE.PerspectiveCamera(
-    65,
-    innerWidth/innerHeight,
-    .1,
-    1400
-  );
-
-  camera.position.set(0,5.1,10);
-
-  camera.rotation.x=-.22;
-
-
-  renderer=new THREE.WebGLRenderer({
-    canvas:document.getElementById("game"),
-    antialias:true
-  });
-
-  renderer.setSize(innerWidth,innerHeight);
-
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio,2)
-  );
-
-  renderer.outputEncoding=THREE.sRGBEncoding;
-
-
-  scene.add(
-    new THREE.HemisphereLight(
-      0x9bdcff,
-      0x061018,
-      1.8
-    )
-  );
-
-
-  const sun=new THREE.DirectionalLight(
-    0xffd6a0,
-    1.5
-  );
-
-  sun.position.set(-80,100,-180);
-
-  scene.add(sun);
-
-
-  buildBackground();
-
-  buildRoad();
-
-  buildPlayer();
-
-  setup();
-
-
-  document.getElementById("best").textContent=
-    best.toLocaleString();
-
-
-  clock=new THREE.Clock();
-
-  animate();
-}
-
-
-
-function buildBackground(){
-
-  const sky=new THREE.Mesh(
-    new THREE.SphereGeometry(700,32,16),
-    new THREE.MeshBasicMaterial({
-      color:0x18344a,
-      side:THREE.BackSide
-    })
-  );
-
-  scene.add(sky);
-
-
-  const sun=new THREE.Mesh(
-    new THREE.CircleGeometry(42,48),
-    new THREE.MeshBasicMaterial({
-      color:0xffb45d
-    })
-  );
-
-  sun.position.set(-105,78,-420);
-
-  scene.add(sun);
-
-
-  for(let i=0;i<100;i++){
-
-    const h=18+Math.random()*130;
-
-    const w=8+Math.random()*20;
-
-    const b=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        w,
-        h,
-        12+Math.random()*20
-      ),
-      new THREE.MeshStandardMaterial({
-        color:
-          Math.random()>.5
-          ?0x07121d
-          :0x0b1b27,
-        roughness:1
-      })
-    );
-
-    b.position.set(
-      (Math.random()-.5)*300,
-      h/2,
-      -140-Math.random()*700
-    );
-
-    scene.add(b);
-
-    city.push(b);
-  }
-
-
-  for(let i=0;i<45;i++){
-
-    const x=(Math.random()-.5)*240;
-
-    const z=-180-Math.random()*600;
-
-    const bar=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        7,.12,.12
-      ),
-      new THREE.MeshBasicMaterial({
-        color:
-          Math.random()>.5
-          ?0x42dfff
-          :0xff597d
-      })
-    );
-
-    bar.position.set(
-      x,
-      8+Math.random()*90,
-      z
-    );
-
-    scene.add(bar);
-
-    city.push(bar);
-  }
-}
-
-
-
-function buildRoad(){
-
-  const road=new THREE.Mesh(
-    new THREE.PlaneGeometry(30,1500),
-    new THREE.MeshStandardMaterial({
-      color:0x05080c,
-      metalness:.7,
-      roughness:.45
-    })
-  );
-
-  road.rotation.x=-Math.PI/2;
-
-  road.position.z=-650;
-
-  scene.add(road);
-
-
-  [-1,1].forEach(s=>{
-
-    const edge=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .25,
-        .35,
-        1500
-      ),
-      new THREE.MeshBasicMaterial({
-        color:
-          s<0
-          ?0xff356f
-          :0x27dfff
-      })
-    );
-
-    edge.position.set(
-      s*14,
-      .2,
-      -650
-    );
-
-    scene.add(edge);
-  });
-
-
-  for(
-    let z=-1450;
-    z<80;
-    z+=12
-  ){
-
-    for(
-      let i=-2;
-      i<=2;
-      i++
-    ){
-
-      const m=new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .12,
-          .04,
-          5
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            i%2
-            ?0xff356f
-            :0x27dfff
-        })
-      );
-
-      m.position.set(
-        i*laneW+laneW/2,
-        .04,
-        z
-      );
-
-      scene.add(m);
-
-      roadMarks.push(m);
-    }
-  }
-}
-
-
-
-function buildPlayer(){
-
-  if(player)
-    scene.remove(player);
-
-
-  player=new THREE.Group();
-
-  const c=CARS[0];
-
-
-  const bodyMat=
-    new THREE.MeshStandardMaterial({
-      color:c.color,
-      metalness:.94,
-      roughness:.14,
-      emissive:c.color,
-      emissiveIntensity:.08
-    });
-
-
-  const dark=
-    new THREE.MeshStandardMaterial({
-      color:0x05080d,
-      metalness:.9,
-      roughness:.08
-    });
-
-
-  const glass=
-    new THREE.MeshStandardMaterial({
-      color:0x102936,
-      metalness:.85,
-      roughness:.03
-    });
-
-
-  const add=(
-    geo,
-    mat,
-    pos,
-    rot
-  )=>{
-
-    let m=new THREE.Mesh(
-      geo,
-      mat
-    );
-
-    m.position.set(...pos);
-
-    if(rot)
-      m.rotation.set(...rot);
-
-    player.add(m);
-
-    return m;
-  };
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.5,.55,4.8
-    ),
-    bodyMat,
-    [0,.62,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.15,.34,1.2
-    ),
-    bodyMat,
-    [0,.74,-2.62]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.7,.5,2.05
-    ),
-    dark,
-    [0,1.05,.05]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.5,.34,.12
-    ),
-    glass,
-    [0,1.18,-.92],
-    [-.25,0,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      1.5,.30,.12
-    ),
-    glass,
-    [0,1.17,1.02],
-    [.22,0,0]
-  );
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.25,.11,.55
-    ),
-    bodyMat,
-    [0,1.43,1.95]
-  );
-
-
-  [-.72,.72].forEach(x=>{
-
-    add(
-      new THREE.BoxGeometry(
-        .48,.12,.14
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0xe9ffff
-      }),
-      [x,.73,-3.18]
-    );
-
-  });
-
-
-  add(
-    new THREE.BoxGeometry(
-      2.15,.12,.14
-    ),
-    new THREE.MeshBasicMaterial({
-      color:0xff174f
-    }),
-    [0,.76,2.43]
-  );
-
-
-  [-1,1].forEach(s=>{
-
-    add(
-      new THREE.BoxGeometry(
-        .13,.4,2.8
-      ),
-      bodyMat,
-      [s*1.2,.72,0]
-    );
-
-
-    add(
-      new THREE.BoxGeometry(
-        .18,.12,.3
-      ),
-      bodyMat,
-      [s*1.2,1.15,-.75]
-    );
-
-  });
-
-
-  const tireMat=
-    new THREE.MeshStandardMaterial({
-      color:0x010203,
-      roughness:.3,
-      metalness:.6
-    });
-
-
-  const rimMat=
-    new THREE.MeshBasicMaterial({
-      color:c.accent
-    });
-
-
-  [
-    [-1.27,.44,-1.55],
-    [1.27,.44,-1.55],
-    [-1.27,.44,1.55],
-    [1.27,.44,1.55]
-  ].forEach(p=>{
-
-    const g=new THREE.Group();
-
-    g.position.set(...p);
-
-
-    const t=new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .48,
-        .48,
-        .34,
-        20
-      ),
-      tireMat
-    );
-
-    t.rotation.z=Math.PI/2;
-
-    g.add(t);
-
-
-    const r=new THREE.Mesh(
-      new THREE.TorusGeometry(
-        .29,
-        .055,
-        8,
-        18
-      ),
-      rimMat
-    );
-
-    r.rotation.y=Math.PI/2;
-
-    g.add(r);
-
-    player.add(g);
-  });
-
-
-  const glow=new THREE.PointLight(
-    0x10dff0,
-    4,
-    15
-  );
-
-  glow.position.y=.25;
-
-  player.add(glow);
-
-
-  shieldMesh=new THREE.Mesh(
-    new THREE.SphereGeometry(
-      3,
-      24,
-      24
-    ),
-    new THREE.MeshBasicMaterial({
-      color:0x25dfff,
-      wireframe:true,
-      transparent:true,
-      opacity:.2
-    })
-  );
-
-  shieldMesh.position.y=.8;
-
-  player.add(shieldMesh);
-
-
-  player.position.set(
-    0,
-    0,
-    3
-  );
-
-  scene.add(player);
-}
-
-
-
-function spawnTraffic(){
-
-  const l=
-    Math.floor(Math.random()*5)-2;
-
-
-  const g=new THREE.Group();
-
-
-  const isPolice=
-    police &&
-    Math.random()<.62;
-
-
-  const truck=
-    !isPolice &&
-    Math.random()<.18;
-
-
-  const col=[
-    0xff315f,
-    0x00d084,
-    0xffb300,
-    0x7c4dff,
-    0x26d9ff
-  ][
-    Math.floor(
-      Math.random()*5
-    )
-  ];
-
-
-  const mat=
-    new THREE.MeshStandardMaterial({
-      color:
-        isPolice
-        ?0x10131a
-        :col,
-      metalness:.85,
-      roughness:.18
-    });
-
-
-  if(truck){
-
-    const cab=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.55,
-        1.65,
-        2.8
-      ),
-      mat
-    );
-
-    cab.position.set(
-      0,
-      1.05,
-      -1.8
-    );
-
-    g.add(cab);
-
-
-    const box=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.7,
-        2.25,
-        4.6
-      ),
-      new THREE.MeshStandardMaterial({
-        color:0x202833,
-        metalness:.4
-      })
-    );
-
-    box.position.set(
-      0,
-      1.35,
-      1.5
-    );
-
-    g.add(box);
-
-  }else{
-
-    const b=new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.2,
-        .8,
-        4.3
-      ),
-      mat
-    );
-
-    b.position.y=.55;
-
-    g.add(b);
-
-
-    if(isPolice){
-
-      const bar=new THREE.Mesh(
-        new THREE.BoxGeometry(
-          1.5,
-          .16,
-          .35
-        ),
-        new THREE.MeshBasicMaterial({
-          color:0xff174f
-        })
-      );
-
-      bar.position.y=1.15;
-
-      g.add(bar);
-    }
-  }
-
-
-  g.position.set(
-    l*laneW,
-    -.0,
-    -230-Math.random()*35
-  );
-
-  scene.add(g);
-
-
-  traffic.push({
-    g,
-    l,
-    speed:100+Math.random()*70,
-    police:isPolice,
-    passed:false
-  });
-}
-
-
-
-function spawnPickup(){
-
-  const l=
-    Math.floor(Math.random()*5)-2;
-
-
-  const g=new THREE.Group();
-
-
-  const type=
-    Math.random()<.45
-    ?"nitro"
-    :Math.random()<.5
-    ?"shield"
-    :"credit";
-
-
-  const color=
-    type==="nitro"
-    ?0x20eaff
-    :type==="shield"
-    ?0x4c7dff
-    :0xffd21f;
-
-
-  g.add(
-    new THREE.Mesh(
-      new THREE.OctahedronGeometry(.8),
-      new THREE.MeshBasicMaterial({
-        color,
-        wireframe:type==="nitro"
-      })
-    )
-  );
-
-
-  g.position.set(
-    l*laneW,
-    1.2,
-    -230
-  );
-
-
-  scene.add(g);
-
-
-  pickups.push({
-    g,
-    type
-  });
-}
-
-
-
-function setup(){
-
-  addEventListener(
-    "resize",
-    resize
-  );
-
-
-  addEventListener(
-    "keydown",
-    e=>{
-
-      if(
-        e.key==="ArrowLeft" ||
-        e.key.toLowerCase()==="a"
-      )
-        left();
-
-
-      if(
-        e.key==="ArrowRight" ||
-        e.key.toLowerCase()==="d"
-      )
-        right();
-
-
-      if(
-        e.key==="ArrowUp" ||
-        e.key.toLowerCase()==="w" ||
-        e.key==="Shift"
-      )
-        setBoost(true);
-
-
-      if(
-        e.key==="Escape" ||
-        e.key===" "
-      )
-        pauseGame();
-
-    }
-  );
-
-
-  addEventListener(
-    "keyup",
-    e=>{
-
-      if(
-        e.key==="ArrowUp" ||
-        e.key.toLowerCase()==="w" ||
-        e.key==="Shift"
-      )
-        setBoost(false);
-
-    }
-  );
-
-
-  document.getElementById(
-    "left"
-  ).onpointerdown=left;
-
-
-  document.getElementById(
-    "right"
-  ).onpointerdown=right;
-
-
-  const b=
-    document.getElementById(
-      "boost"
-    );
-
-
-  b.onpointerdown=
-    ()=>setBoost(true);
-
-
-  b.onpointerup=
-    ()=>setBoost(false);
-
-
-  b.onpointercancel=
-    ()=>setBoost(false);
-
-
-  let sx=0;
-
-
-  addEventListener(
-    "touchstart",
-    e=>{
-
-      if(e.touches[0])
-        sx=e.touches[0].clientX;
-
-    },
-    {passive:true}
-  );
-
-
-  addEventListener(
-    "touchend",
-    e=>{
-
-      if(!running || paused)
-        return;
-
-
-      const dx=
-        e.changedTouches[0].clientX-sx;
-
-
-      if(Math.abs(dx)>45){
-
-        dx<0
-        ?left()
-        :right();
-
+      tone(freq, dur = 0.12, type = 'sine', vol = 0.12) {
+        this.init();
+        if (this.isMuted || !this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+          osc.connect(gain).connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + dur);
+        } catch(e) {}
       }
 
-    },
-    {passive:true}
-  );
-}
-
-
-
-function left(){
-
-  if(running&&!paused){
-
-    lane=
-      Math.max(
-        -2,
-        lane-1
-      );
-
-    targetX=
-      lane*laneW;
-  }
-}
-
-
-
-function right(){
-
-  if(running&&!paused){
-
-    lane=
-      Math.min(
-        2,
-        lane+1
-      );
-
-    targetX=
-      lane*laneW;
-  }
-}
-
-
-
-function setBoost(v){
-
-  if(!running||paused){
-
-    boost=false;
-
-    return;
-  }
-
-
-  boost=
-    v &&
-    nitro>3;
-}
-
-
-
-function startGame(){
-
-  [
-    "menu",
-    "over",
-    "pause"
-  ].forEach(id=>
-    document
-      .getElementById(id)
-      .classList.add("hidden")
-  );
-
-
-  document
-    .getElementById("hud")
-    .classList.remove("hidden");
-
-
-  document
-    .getElementById("mobile")
-    .classList.remove("hidden");
-
-
-  traffic.forEach(
-    x=>scene.remove(x.g)
-  );
-
-  traffic=[];
-
-
-  pickups.forEach(
-    x=>scene.remove(x.g)
-  );
-
-  pickups=[];
-
-
-  lane=0;
-  targetX=0;
-
-  score=0;
-  distance=0;
-
-  nitro=100;
-  shield=1;
-
-  speed=155;
-  maxSpeed=155;
-
-  spawn=0;
-  pickupSpawn=0;
-
-  policeTimer=0;
-  police=false;
-
-  boost=false;
-
-  running=true;
-  paused=false;
-
-
-  player.position.set(
-    0,
-    0,
-    3
-  );
-
-
-  shieldMesh.visible=true;
-
-  updateHud();
-}
-
-
-
-function pauseGame(){
-
-  if(!running)
-    return;
-
-
-  paused=!paused;
-
-
-  document
-    .getElementById("pause")
-    .classList.toggle(
-      "hidden",
-      !paused
-    );
-
-
-  if(paused)
-    boost=false;
-}
-
-
-
-function goHome(){
-
-  running=false;
-  paused=false;
-  boost=false;
-
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("mobile")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("pause")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("over")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("menu")
-    .classList.remove("hidden");
-}
-
-
-
-function crash(){
-
-  if(!running)
-    return;
-
-
-  if(shield>0){
-
-    shield--;
-
-    shieldMesh.visible=false;
-
-    shake=.7;
-
-    return;
-  }
-
-
-  running=false;
-
-  boost=false;
-
-  shake=1.2;
-
-
-  const final=
-    Math.floor(score);
-
-
-  if(final>best){
-
-    best=final;
-
-    localStorage.setItem(
-      bestKey,
-      best
-    );
-  }
-
-
-  document.getElementById(
-    "finalScore"
-  ).textContent=
-    final.toLocaleString();
-
-
-  document.getElementById(
-    "finalDistance"
-  ).textContent=
-    Math.floor(distance)+" M";
-
-
-  document.getElementById(
-    "finalSpeed"
-  ).textContent=
-    Math.floor(maxSpeed)+" KM/H";
-
-
-  document.getElementById(
-    "best"
-  ).textContent=
-    best.toLocaleString();
-
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("mobile")
-    .classList.add("hidden");
-
-
-  setTimeout(
-    ()=>document
-      .getElementById("over")
-      .classList.remove("hidden"),
-    450
-  );
-}
-
-
-
-function update(dt){
-
-  const difficulty=
-    Math.min(
-      2.25,
-      1+distance/2800
-    );
-
-
-  const target=
-    CARS[0].top*
-    (.68+.32*difficulty)
-    +
-    (boost
-      ?CARS[0].nitro
-      :0);
-
-
-  if(boost){
-
-    nitro=
-      Math.max(
-        0,
-        nitro-dt*38
-      );
-
-
-    if(nitro<=0)
-      boost=false;
-
-  }else{
-
-    nitro=
-      Math.min(
-        100,
-        nitro+dt*2.7
-      );
-  }
-
-
-  speed+=
-    (target-speed)*
-    Math.min(
-      1,
-      dt*(boost?5:2.1)
-    );
-
-
-  maxSpeed=
-    Math.max(
-      maxSpeed,
-      speed
-    );
-
-
-  distance+=
-    speed*.22*dt;
-
-
-  score+=
-    speed*.13*dt*
-    (boost?2.2:1);
-
-
-  policeTimer+=dt;
-
-
-  if(
-    !police &&
-    policeTimer>18
-  ){
-
-    police=true;
-
-    policeTimer=0;
-  }
-
-
-  if(
-    police &&
-    policeTimer>16
-  ){
-
-    police=false;
-
-    policeTimer=0;
-  }
-
-
-  player.position.x+=
-    (targetX-player.position.x)*
-    Math.min(
-      1,
-      dt*13
-    );
-
-
-  player.rotation.z=
-    -(targetX-player.position.x)*
-    .055;
-
-
-  camera.position.x+=
-    (
-      player.position.x*.25-
-      camera.position.x
-    )*
-    dt*8;
-
-
-  camera.fov+=
-    (
-      (boost?80:65)-
-      camera.fov
-    )*
-    dt*5;
-
-
-  camera.updateProjectionMatrix();
-
-
-  if(shake>0){
-
-    camera.position.y=
-      5.1+
-      (Math.random()-.5)*
-      shake;
-
-
-    camera.position.x+=
-      (Math.random()-.5)*
-      shake;
-
-
-    shake=
-      Math.max(
-        0,
-        shake-dt*2.4
-      );
-
-  }else{
-
-    camera.position.y=5.1;
-  }
-
-
-  const move=
-    (speed*.055+10)*dt;
-
-
-  roadMarks.forEach(m=>{
-
-    m.position.z+=move;
-
-
-    if(m.position.z>25)
-      m.position.z-=1500;
-
-  });
-
-
-  city.forEach(b=>{
-
-    b.position.z+=move*.75;
-
-
-    if(b.position.z>80)
-      b.position.z-=800;
-
-  });
-
-
-  spawn+=dt;
-
-  pickupSpawn+=dt;
-
-
-  const interval=
-    Math.max(
-      .25,
-      .82-distance/5500
-    );
-
-
-  if(spawn>interval){
-
-    spawnTraffic();
-
-    spawn=0;
-  }
-
-
-  if(pickupSpawn>4){
-
-    spawnPickup();
-
-    pickupSpawn=0;
-  }
-
-
-  for(
-    let i=traffic.length-1;
-    i>=0;
-    i--
-  ){
-
-    const t=traffic[i];
-
-
-    t.g.position.z+=
-      (
-        (speed-t.speed)*.045+
-        8+
-        distance*.0007
-      )*dt;
-
-
-    const cx=
-      Math.abs(
-        player.position.x-
-        t.g.position.x
-      );
-
-
-    const cz=
-      Math.abs(
-        player.position.z-
-        t.g.position.z
-      );
-
-
-    if(
-      !t.passed &&
-      t.g.position.z>
-      player.position.z-1.8
-    ){
-
-      t.passed=true;
-
-
-      if(
-        cx>1.75 &&
-        cx<3.1
-      )
-        score+=350;
-    }
-
-
-    if(
-      cx<2.12 &&
-      cz<4.0
-    ){
-
-      crash();
-
-      break;
-    }
-
-
-    if(t.g.position.z>30){
-
-      scene.remove(t.g);
-
-      traffic.splice(i,1);
-    }
-  }
-
-
-  for(
-    let i=pickups.length-1;
-    i>=0;
-    i--
-  ){
-
-    const p=pickups[i];
-
-
-    p.g.position.z+=move;
-
-    p.g.rotation.y+=dt*3;
-
-
-    if(
-      player.position.distanceTo(
-        p.g.position
-      )<2.5
-    ){
-
-      if(p.type==="nitro")
-        nitro=100;
-
-
-      if(p.type==="shield"){
-
-        shield=
-          Math.min(
-            2,
-            shield+1
-          );
-
-        shieldMesh.visible=true;
+      playNitro() {
+        this.init();
+        if (this.isMuted || !this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(120, now);
+          osc.frequency.exponentialRampToValueAtTime(750, now + 0.35);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+          osc.connect(gain).connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } catch(e) {}
       }
 
-
-      if(p.type==="credit")
-        score+=500;
-
-
-      scene.remove(p.g);
-
-      pickups.splice(i,1);
-
-      continue;
-    }
-
-
-    if(p.g.position.z>30){
-
-      scene.remove(p.g);
-
-      pickups.splice(i,1);
-    }
-  }
-
-
-  updateHud();
-}
-
-
-
-function updateHud(){
-
-  document.getElementById(
-    "speed"
-  ).textContent=
-    Math.floor(speed);
-
-
-  document.getElementById(
-    "score"
-  ).textContent=
-    Math.floor(score)
-    .toLocaleString();
-
-
-  document.getElementById(
-    "distance"
-  ).textContent=
-    Math.floor(distance)+" M";
-
-
-  document.getElementById(
-    "nitro"
-  ).textContent=
-    Math.floor(nitro)+"%";
-
-
-  document.getElementById(
-    "nitrobar"
-  ).style.width=
-    Math.floor(nitro)+"%";
-
-
-  document.getElementById(
-    "shield"
-  ).textContent=
-    shield>0
-    ?"●"
-    :"EMPTY";
-
-
-  document.getElementById(
-    "police"
-  ).classList.toggle(
-    "hidden",
-    !police
-  );
-}
-
-
-
-function animate(){
-
-  requestAnimationFrame(
-    animate
-  );
-
-
-  const dt=
-    Math.min(
-      clock.getDelta(),
-      .05
-    );
-
-
-  if(
-    running &&
-    !paused
-  )
-    update(dt);
-
-
-  renderer.render(
-    scene,
-    camera
-  );
-}
-
-
-
-function resize(){
-
-  camera.aspect=
-    innerWidth/innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-}
-
-
-document.getElementById(
-  "carName"
-).textContent=
-  CARS[0].name;
-
-
-init();
-
-</script>
-
-</body>
-</html> html>
-<html lang="en">
-<head>
-  <script src="https://pl31526971.profitableratecpmnetwork.com/26/b5/75/26b5758b492e42d6acefaead60cf2381.js"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>NEON PURSUIT 3D — CYBER CITY</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  user-select:none;
-  -webkit-user-select:none;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#01020a;
-  color:white;
-  font-family:'Rajdhani',sans-serif;
-  touch-action:none;
-}
-
-.font-cyber{font-family:'Orbitron',monospace}
-
-canvas#game{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  display:block;
-  z-index:1;
-}
-
-#ui{
-  position:fixed;
-  inset:0;
-  z-index:10;
-  pointer-events:none;
-}
-
-.pointer-auto{pointer-events:auto}
-
-.hidden{display:none!important}
-
-.neon-cyan{
-  text-shadow:
-    0 0 8px #00f0ff,
-    0 0 20px #00f0ff,
-    0 0 45px rgba(0,240,255,.45);
-}
-
-.neon-pink{
-  text-shadow:
-    0 0 8px #ff0077,
-    0 0 20px #ff0077,
-    0 0 45px rgba(255,0,119,.45);
-}
-
-.panel{
-  background:rgba(4,7,25,.86);
-  border:1px solid rgba(0,240,255,.4);
-  box-shadow:
-    0 0 35px rgba(0,240,255,.16),
-    inset 0 0 30px rgba(255,0,128,.06);
-  backdrop-filter:blur(18px);
-}
-
-.crt-overlay{
-  position:fixed;
-  inset:0;
-  z-index:5;
-  pointer-events:none;
-  opacity:.28;
-  background:
-    linear-gradient(
-      rgba(255,255,255,0) 50%,
-      rgba(0,0,0,.3) 50%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255,0,0,.025),
-      rgba(0,255,255,.018),
-      rgba(0,0,255,.025)
-    );
-  background-size:100% 4px,6px 100%;
-}
-
-button{
-  -webkit-tap-highlight-color:transparent;
-}
-
-@keyframes pulseGlow{
-  0%,100%{box-shadow:0 0 15px rgba(0,240,255,.2)}
-  50%{box-shadow:0 0 35px rgba(0,240,255,.6)}
-}
-
-.glow-button{
-  animation:pulseGlow 2s infinite;
-}
-</style>
-</head>
-
-<body>
-
-<canvas id="game"></canvas>
-<div class="crt-overlay"></div>
-
-<div id="ui">
-
-<!-- HUD -->
-<div id="hud"
- class="hidden absolute top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl flex flex-col gap-2">
-
-  <div class="panel rounded-2xl px-4 py-2.5 flex justify-between items-center">
-
-    <div class="flex items-center gap-2.5">
-      <div class="w-10 h-10 rounded-xl bg-cyan-950/70 border border-cyan-400/50 flex items-center justify-center text-cyan-400 font-cyber">
-        ⚡
-      </div>
-      <div>
-        <div class="text-[9px] text-cyan-400 font-cyber tracking-widest">SPEED</div>
-        <div id="speedText" class="text-xl md:text-2xl font-cyber font-black neon-cyan">
-          140 <span class="text-xs text-cyan-300 font-normal">KM/H</span>
-        </div>
-      </div>
-    </div>
-
-    <div id="policeAlert"
-      class="hidden items-center gap-1 px-3 py-1 bg-red-600/30 border border-red-500 rounded-full animate-pulse">
-      <span class="text-xs font-cyber text-red-300">
-        🚨 POLICE PURSUIT
-      </span>
-    </div>
-
-    <div class="text-center">
-      <div class="text-[9px] text-pink-400 font-cyber tracking-widest">SCORE</div>
-      <div id="scoreText" class="text-xl md:text-2xl font-cyber font-black neon-pink">
-        0
-        <span id="comboBadge"
-          class="hidden ml-1 text-xs text-yellow-300 bg-yellow-500/20 px-1 py-0.5 rounded">
-          1X
-        </span>
-      </div>
-    </div>
-
-    <div class="hidden sm:block text-right">
-      <div class="text-[9px] text-amber-400 font-cyber tracking-widest">DISTANCE</div>
-      <div id="distanceText" class="text-lg md:text-xl font-cyber font-black text-amber-300">
-        0 M
-      </div>
-    </div>
-
-    <div class="flex gap-2 pointer-auto">
-      <button id="audioBtn"
-        onclick="toggleAudio()"
-        class="p-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-400">
-        🔊
-      </button>
-
-      <button onclick="togglePause()"
-        class="p-2 rounded-xl bg-slate-900 border border-cyan-500/30 text-cyan-400">
-        ⏸
-      </button>
-    </div>
-  </div>
-
-  <div class="flex items-center justify-between px-1">
-
-    <div class="flex items-center gap-2 bg-black/60 border border-cyan-500/30 px-3 py-1.5 rounded-xl">
-      <span class="text-xs font-cyber text-cyan-400">NITRO</span>
-
-      <div class="w-32 sm:w-48 h-2.5 bg-slate-950 rounded-full overflow-hidden border border-cyan-500/40 p-0.5">
-        <div id="nitroBar"
-          class="h-full bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 rounded-full"
-          style="width:100%">
-        </div>
-      </div>
-
-      <span id="nitroPercent" class="text-[11px] font-cyber text-cyan-300">
-        100%
-      </span>
-    </div>
-
-    <div class="flex items-center gap-1.5 bg-black/60 border border-blue-500/30 px-3 py-1.5 rounded-xl">
-      <span class="text-xs text-blue-400 font-cyber">SHIELD</span>
-      <div id="shieldPills" class="flex gap-1"></div>
-    </div>
-
-  </div>
-
-  <div id="nearMissToast"
-    class="hidden self-center bg-gradient-to-r from-pink-600/90 to-purple-600/90 border border-pink-400 px-5 py-1.5 rounded-xl">
-    <span id="nearMissText" class="font-cyber font-black tracking-wider text-sm">
-      ⚡ NEAR MISS!
-    </span>
-  </div>
-
-</div>
-
-<!-- START SCREEN -->
-<div id="startScreen"
- class="absolute inset-0 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
-
-  <div class="panel rounded-3xl p-7 w-full max-w-md text-center">
-
-    <div class="inline-flex px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-[10px] font-cyber text-cyan-300 tracking-[3px] mb-3">
-      NEO-TOKYO // SECTOR 09
-    </div>
-
-    <h1 class="text-4xl sm:text-5xl font-cyber font-black tracking-wider neon-cyan">
-      NEON
-      <span class="text-pink-500 neon-pink">PURSUIT</span>
-    </h1>
-
-    <p class="text-slate-300 text-xs sm:text-sm mt-2">
-      Cyber City Highway Interception
-    </p>
-
-    <div class="mt-5 p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
-
-      <div class="text-left">
-        <div class="text-[9px] text-cyan-400 font-cyber">
-          SELECTED MACHINE
-        </div>
-
-        <div id="menuCarName"
-          class="text-sm font-cyber font-bold">
-          PHANTOM GT-99
-        </div>
-      </div>
-
-      <button onclick="openGarage()"
-        class="pointer-auto px-3 py-1 rounded-xl bg-cyan-600/30 border border-cyan-400/50 text-cyan-300 text-xs font-cyber">
-        GARAGE ⚙️
-      </button>
-    </div>
-
-    <div class="mt-6 flex flex-col gap-3">
-
-      <button onclick="startGame()"
-        class="pointer-auto glow-button w-full py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 font-cyber font-black tracking-wider">
-        🚀 LAUNCH PURSUIT
-      </button>
-
-      <button onclick="openGarage()"
-        class="pointer-auto w-full py-2.5 rounded-2xl bg-slate-900 border border-slate-700 text-cyan-300 font-cyber text-xs">
-        VEHICLE CUSTOMIZATION
-        (<span id="creditDisplay">0</span> CREDITS)
-      </button>
-
-    </div>
-
-    <div class="grid grid-cols-2 gap-3 mt-4">
-
-      <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-left">
-        <div class="text-[10px] text-amber-400 font-cyber">
-          BEST RECORD
-        </div>
-
-        <div id="highScoreText"
-          class="text-sm font-cyber font-black text-white mt-1">
-          0 PTS
-        </div>
-      </div>
-
-      <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-left">
-        <div class="text-[10px] text-pink-400 font-cyber">
-          CONTROLS
-        </div>
-
-        <div class="text-xs text-slate-300 mt-1">
-          A/D • Arrows • Drag
-        </div>
-      </div>
-
-    </div>
-
-    <div class="text-[10px] text-slate-400 mt-4">
-      Graze traffic, collect powerups and escape police interceptors.
-    </div>
-
-  </div>
-</div>
-
-<!-- GARAGE -->
-<div id="garageScreen"
- class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/65 backdrop-blur-md">
-
-  <div class="panel rounded-3xl p-6 w-full max-w-lg">
-
-    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-
-      <h2 class="text-xl font-cyber font-black neon-cyan">
-        CYBER GARAGE
-      </h2>
-
-      <span class="text-xs font-cyber text-amber-300 bg-amber-950/50 border border-amber-500/40 px-3 py-1 rounded-xl">
-        💎 <span id="garageCredits">0</span>
-      </span>
-
-    </div>
-
-    <div class="mt-4 flex items-center justify-between">
-
-      <button onclick="prevCar()"
-        class="pointer-auto p-2.5 rounded-xl bg-slate-900 border border-slate-700">
-        ◀
-      </button>
-
-      <div class="text-center">
-        <div id="garageCarClass"
-          class="text-[10px] font-cyber text-cyan-400">
-          SYNTH RUNNER
-        </div>
-
-        <h3 id="garageCarName"
-          class="text-xl font-cyber font-black">
-          PHANTOM GT-99
-        </h3>
-      </div>
-
-      <button onclick="nextCar()"
-        class="pointer-auto p-2.5 rounded-xl bg-slate-900 border border-slate-700">
-        ▶
-      </button>
-
-    </div>
-
-    <div class="mt-4 bg-black/50 border border-slate-800 rounded-2xl p-4 space-y-3 text-xs">
-
-      <div>
-        <div class="flex justify-between font-cyber mb-1">
-          <span class="text-slate-400">TOP VELOCITY</span>
-          <span id="statSpeed" class="text-cyan-300">240 KM/H</span>
-        </div>
-        <div class="h-1.5 bg-slate-900 rounded-full overflow-hidden">
-          <div id="barSpeed" class="h-full bg-cyan-400" style="width:75%"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between font-cyber mb-1">
-          <span class="text-slate-400">ACCELERATION</span>
-          <span id="statAccel" class="text-pink-300">85%</span>
-        </div>
-        <div class="h-1.5 bg-slate-900 rounded-full overflow-hidden">
-          <div id="barAccel" class="h-full bg-pink-500" style="width:85%"></div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between font-cyber mb-1">
-          <span class="text-slate-400">NITRO WARP</span>
-          <span id="statNitro" class="text-purple-300">+80 KM/H</span>
-        </div>
-        <div class="h-1.5 bg-slate-900 rounded-full overflow-hidden">
-          <div id="barNitro" class="h-full bg-purple-500" style="width:70%"></div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="mt-4 flex items-center justify-between bg-black/40 border border-slate-800 p-2.5 rounded-2xl">
-
-      <span class="text-xs font-cyber text-slate-300">
-        UNDERGLOW
-      </span>
-
-      <div class="flex gap-2 pointer-auto">
-
-        <button onclick="setCarUnderglow('#00f0ff')"
-          class="w-6 h-6 rounded-full bg-cyan-400 border border-white"></button>
-
-        <button onclick="setCarUnderglow('#ff0077')"
-          class="w-6 h-6 rounded-full bg-pink-500 border border-white"></button>
-
-        <button onclick="setCarUnderglow('#ffaa00')"
-          class="w-6 h-6 rounded-full bg-yellow-400 border border-white"></button>
-
-        <button onclick="setCarUnderglow('#a855f7')"
-          class="w-6 h-6 rounded-full bg-purple-500 border border-white"></button>
-
-        <button onclick="setCarUnderglow('#00ff66')"
-          class="w-6 h-6 rounded-full bg-green-400 border border-white"></button>
-
-      </div>
-
-    </div>
-
-    <div class="mt-5 flex gap-3">
-
-      <button id="garageSelectBtn"
-        onclick="selectCarAction()"
-        class="pointer-auto flex-1 py-3 rounded-xl bg-cyan-500 text-black font-cyber font-black">
-        DEPLOY MACHINE
-      </button>
-
-      <button onclick="closeGarage()"
-        class="pointer-auto px-5 py-3 rounded-xl bg-slate-900 border border-slate-700">
-        BACK
-      </button>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- GAME OVER -->
-<div id="gameOver"
- class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-
-  <div class="panel rounded-3xl p-6 md:p-8 w-full max-w-md text-center">
-
-    <div class="text-5xl">💥</div>
-
-    <h2 class="text-2xl sm:text-3xl font-cyber font-black text-red-500 mt-2">
-      CRASH DETECTED
-    </h2>
-
-    <p class="text-slate-400 text-xs mt-1">
-      Pursuit simulation terminated
-    </p>
-
-    <div id="newRecordBadge"
-      class="hidden my-2.5 py-1 px-4 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-black font-cyber font-black text-xs">
-      🏆 NEW RECORD
-    </div>
-
-    <div class="bg-black/50 border border-slate-800 rounded-2xl p-4 mt-4 space-y-2 text-sm">
-
-      <div class="flex justify-between border-b border-slate-800 pb-2">
-        <span class="text-slate-400 font-cyber">TOTAL SCORE</span>
-        <b id="finalScore" class="text-cyan-400 font-cyber">0</b>
-      </div>
-
-      <div class="flex justify-between border-b border-slate-800 pb-2">
-        <span class="text-slate-400 font-cyber">DISTANCE</span>
-        <b id="finalDistance" class="font-cyber">0 M</b>
-      </div>
-
-      <div class="flex justify-between border-b border-slate-800 pb-2">
-        <span class="text-slate-400 font-cyber">MAX VELOCITY</span>
-        <b id="finalSpeed" class="text-pink-400 font-cyber">140 KM/H</b>
-      </div>
-
-      <div class="flex justify-between">
-        <span class="text-slate-400 font-cyber">DATA SHARDS</span>
-        <b id="finalCredits" class="text-amber-400 font-cyber">+0</b>
-      </div>
-
-    </div>
-
-    <button onclick="startGame()"
-      class="pointer-auto mt-5 w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 font-cyber font-black">
-      🔄 RACE AGAIN
-    </button>
-
-    <button onclick="home()"
-      class="pointer-auto mt-2.5 w-full py-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-cyber">
-      MAIN MENU
-    </button>
-
-  </div>
-</div>
-
-<!-- PAUSE -->
-<div id="pauseScreen"
- class="hidden absolute inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-
-  <div class="panel rounded-3xl p-6 w-full max-w-xs text-center">
-
-    <h2 class="text-xl font-cyber font-black neon-cyan">
-      PAUSED
-    </h2>
-
-    <div class="mt-5 space-y-2.5">
-
-      <button onclick="togglePause()"
-        class="pointer-auto w-full py-3 rounded-xl bg-cyan-500 text-black font-cyber font-black">
-        RESUME
-      </button>
-
-      <button onclick="home()"
-        class="pointer-auto w-full py-2.5 rounded-xl bg-slate-900 border border-slate-700">
-        QUIT TO MENU
-      </button>
-
-    </div>
-  </div>
-</div>
-
-<!-- MOBILE CONTROLS -->
-<div id="mobileControls"
- class="hidden absolute bottom-4 left-0 right-0 px-4 md:px-8 flex justify-between items-end">
-
-  <div class="flex gap-3 pointer-auto">
-
-    <button id="leftBtn"
-      class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-950/80 border-2 border-cyan-400/60 text-cyan-300 text-3xl">
-      ◀
-    </button>
-
-    <button id="rightBtn"
-      class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-950/80 border-2 border-pink-400/60 text-pink-300 text-3xl">
-      ▶
-    </button>
-
-  </div>
-
-  <button id="nitroBtn"
-    class="pointer-auto w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-cyan-600 via-purple-600 to-pink-500 border-2 border-white/60 text-white font-cyber font-black">
-    <span class="text-2xl">🔥</span>
-    <span class="block text-[10px] tracking-widest">NITRO</span>
-  </button>
-
-</div>
-
-</div>
-
-<script>
-/* =========================================================
-   NEON PURSUIT 3D
-   SINGLE FILE VERSION
-   ========================================================= */
-
-/* ---------------- AUDIO ---------------- */
-
-class CyberSound{
-  constructor(){
-    this.ctx=null;
-    this.muted=false;
-    this.engineOsc=null;
-    this.engineGain=null;
-    this.engineFilter=null;
-    this.musicTimer=null;
-    this.step=0;
-  }
-
-  init(){
-    if(!this.ctx){
-      const AC=window.AudioContext||window.webkitAudioContext;
-      if(!AC)return;
-      this.ctx=new AC();
-    }
-
-    if(this.ctx.state==="suspended"){
-      this.ctx.resume();
-    }
-  }
-
-  startEngine(){
-    this.init();
-
-    if(this.muted||!this.ctx||this.engineOsc)return;
-
-    this.engineOsc=this.ctx.createOscillator();
-    this.engineFilter=this.ctx.createBiquadFilter();
-    this.engineGain=this.ctx.createGain();
-
-    this.engineOsc.type="sawtooth";
-    this.engineOsc.frequency.value=65;
-
-    this.engineFilter.type="lowpass";
-    this.engineFilter.frequency.value=400;
-
-    this.engineGain.gain.value=.08;
-
-    this.engineOsc
-      .connect(this.engineFilter)
-      .connect(this.engineGain)
-      .connect(this.ctx.destination);
-
-    this.engineOsc.start();
-  }
-
-  updateEngine(ratio,nitro){
-    if(!this.engineOsc||!this.ctx||this.muted)return;
-
-    const f=55+ratio*130+(nitro?55:0);
-
-    this.engineOsc.frequency.setTargetAtTime(
-      f,
-      this.ctx.currentTime,
-      .08
-    );
-  }
-
-  stopEngine(){
-    if(this.engineOsc){
-      try{
-        this.engineOsc.stop();
-        this.engineOsc.disconnect();
-      }catch(e){}
-
-      this.engineOsc=null;
-    }
-  }
-
-  tone(freq,duration=.25,type="sine",volume=.15){
-    this.init();
-
-    if(this.muted||!this.ctx)return;
-
-    const now=this.ctx.currentTime;
-
-    const osc=this.ctx.createOscillator();
-    const gain=this.ctx.createGain();
-
-    osc.type=type;
-    osc.frequency.setValueAtTime(freq,now);
-
-    gain.gain.setValueAtTime(volume,now);
-    gain.gain.exponentialRampToValueAtTime(
-      .001,
-      now+duration
-    );
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now+duration);
-  }
-
-  playNitro(){
-    this.init();
-
-    if(this.muted||!this.ctx)return;
-
-    const now=this.ctx.currentTime;
-
-    const osc=this.ctx.createOscillator();
-    const gain=this.ctx.createGain();
-
-    osc.type="sawtooth";
-    osc.frequency.setValueAtTime(150,now);
-    osc.frequency.exponentialRampToValueAtTime(750,now+.3);
-
-    gain.gain.setValueAtTime(.25,now);
-    gain.gain.exponentialRampToValueAtTime(.01,now+.7);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(now+.7);
-  }
-
-  playPickup(){
-    this.tone(600,.18,"sine",.18);
-
-    setTimeout(()=>{
-      this.tone(900,.18,"sine",.18);
-    },60);
-  }
-
-  playNearMiss(){
-    this.tone(700,.25,"sine",.3);
-  }
-
-  playCrash(){
-    this.stopEngine();
-    this.tone(100,.65,"triangle",.5);
-  }
-
-  playSiren(){
-    this.init();
-
-    if(this.muted||!this.ctx)return;
-
-    const now=this.ctx.currentTime;
-
-    const osc=this.ctx.createOscillator();
-    const gain=this.ctx.createGain();
-
-    osc.type="sawtooth";
-    osc.frequency.setValueAtTime(600,now);
-    osc.frequency.linearRampToValueAtTime(950,now+.35);
-    osc.frequency.linearRampToValueAtTime(600,now+.7);
-
-    gain.gain.setValueAtTime(.12,now);
-    gain.gain.exponentialRampToValueAtTime(.01,now+.8);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(now+.8);
-  }
-
-  startMusic(){
-    this.init();
-
-    if(this.muted||!this.ctx||this.musicTimer)return;
-
-    const notes=[73,73,82,82,92,92,110,82];
-
-    const loop=()=>{
-      if(!this.ctx||this.muted)return;
-
-      this.tone(
-        notes[this.step%notes.length],
-        .12,
-        "sawtooth",
-        .05
-      );
-
-      this.step++;
-
-      this.musicTimer=setTimeout(loop,150);
-    };
-
-    loop();
-  }
-
-  stopMusic(){
-    if(this.musicTimer){
-      clearTimeout(this.musicTimer);
-      this.musicTimer=null;
-    }
-  }
-}
-
-const audio=new CyberSound();
-
-function toggleAudio(){
-  audio.muted=!audio.muted;
-
-  document.getElementById("audioBtn").innerText=
-    audio.muted?"🔇":"🔊";
-
-  if(audio.muted){
-    audio.stopEngine();
-    audio.stopMusic();
-  }else if(running&&!paused){
-    audio.startEngine();
-    audio.startMusic();
-  }
-}
-
-
-/* ---------------- CARS ---------------- */
-
-const CARS=[
-  {
-    name:"PHANTOM GT-99",
-    classType:"SYNTH RUNNER",
-    topSpeed:240,
-    accel:85,
-    nitroBoost:80,
-    bodyColor:"#00f0ff",
-    accentColor:"#3b82f6",
-    underglow:"#00f0ff",
-    price:0,
-    unlocked:true
-  },
-  {
-    name:"VALKYRIE X-1",
-    classType:"HYPER INTERCEPTOR",
-    topSpeed:285,
-    accel:95,
-    nitroBoost:110,
-    bodyColor:"#ff0077",
-    accentColor:"#ec4899",
-    underglow:"#ff0077",
-    price:500,
-    unlocked:false
-  },
-  {
-    name:"TITAN VANGUARD",
-    classType:"CYBER DREADNOUGHT",
-    topSpeed:220,
-    accel:75,
-    nitroBoost:120,
-    bodyColor:"#ffaa00",
-    accentColor:"#f59e0b",
-    underglow:"#ffaa00",
-    price:1000,
-    unlocked:false
-  }
-];
-
-const savedUnlocked=
-  JSON.parse(localStorage.getItem("np_unlockedCars")||"[true,false,false]");
-
-CARS.forEach((c,i)=>{
-  c.unlocked=!!savedUnlocked[i];
-});
-
-let selectedCarIndex=
-  parseInt(localStorage.getItem("np_selectedCar")||"0");
-
-let credits=
-  parseInt(localStorage.getItem("np_credits")||"150");
-
-let highScore=
-  parseInt(localStorage.getItem("np_highscore")||"0");
-
-
-/* ---------------- THREE ---------------- */
-
-let scene;
-let camera;
-let renderer;
-
-let playerGroup;
-let playerShield;
-let leftExhaust;
-let rightExhaust;
-let underglowLight;
-
-let traffic=[];
-let pickups=[];
-let roadLines=[];
-let speedGates=[];
-let buildings=[];
-let skyVehicles=[];
-let debrisList=[];
-
-let rainParticles;
-let starParticles;
-
-let running=false;
-let paused=false;
-let isBoosting=false;
-
-let score=0;
-let distance=0;
-let speed=140;
-let maxSpeed=140;
-let nitro=100;
-let shields=1;
-let combo=1;
-let comboTimer=0;
-
-let currentLane=0;
-let targetX=0;
-
-let spawnTimer=0;
-let pickupTimer=0;
-let pursuitTimer=0;
-let pursuitActive=false;
-let cameraShake=0;
-
-const laneWidth=3.2;
-
-const clock=new THREE.Clock();
-
-
-/* ---------------- INIT ---------------- */
-
-function init(){
-
-  document.getElementById("creditDisplay").innerText=credits;
-  document.getElementById("highScoreText").innerText=
-    highScore.toLocaleString()+" PTS";
-
-  updateShieldUI();
-
-  scene=new THREE.Scene();
-
-  /* NEW BACKGROUND */
-  scene.background=new THREE.Color(0x01020b);
-
-  scene.fog=new THREE.FogExp2(
-    0x03051a,
-    .0075
-  );
-
-  camera=new THREE.PerspectiveCamera(
-    65,
-    innerWidth/innerHeight,
-    .1,
-    1500
-  );
-
-  camera.position.set(0,5,10);
-  camera.rotation.x=-.24;
-
-  renderer=new THREE.WebGLRenderer({
-    canvas:document.getElementById("game"),
-    antialias:true
-  });
-
-  renderer.setSize(innerWidth,innerHeight);
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio,2)
-  );
-
-  renderer.outputEncoding=THREE.sRGBEncoding;
-
-  /* LIGHTING */
-
-  scene.add(
-    new THREE.AmbientLight(
-      0x201040,
-      1
-    )
-  );
-
-  const cyanLight=
-    new THREE.DirectionalLight(
-      0x00eaff,
-      1.3
-    );
-
-  cyanLight.position.set(
-    50,80,-100
-  );
-
-  scene.add(cyanLight);
-
-  const pinkLight=
-    new THREE.DirectionalLight(
-      0xff0066,
-      1.1
-    );
-
-  pinkLight.position.set(
-    -60,50,-80
-  );
-
-  scene.add(pinkLight);
-
-  createNewCyberBackground();
-  buildHighway();
-  buildCity();
-  buildSpeedStreaks();
-  buildPlayerCar();
-
-  setupControls();
-
-  addEventListener("resize",onResize);
-
-  animate();
-}
-
-
-/* =========================================================
-   NEW BACKGROUND
-   ========================================================= */
-
-function createNewCyberBackground(){
-
-  /* STAR FIELD */
-
-  const starCount=1200;
-
-  const geom=new THREE.BufferGeometry();
-  const positions=new Float32Array(starCount*3);
-
-  for(let i=0;i<starCount*3;i+=3){
-
-    positions[i]=
-      (Math.random()-.5)*900;
-
-    positions[i+1]=
-      20+Math.random()*280;
-
-    positions[i+2]=
-      -100-Math.random()*1000;
-  }
-
-  geom.setAttribute(
-    "position",
-    new THREE.BufferAttribute(
-      positions,
-      3
-    )
-  );
-
-  const mat=new THREE.PointsMaterial({
-    color:0x8ffaff,
-    size:.7,
-    transparent:true,
-    opacity:.8
-  });
-
-  starParticles=
-    new THREE.Points(geom,mat);
-
-  scene.add(starParticles);
-
-
-  /* HUGE NEON MOON */
-
-  const moonCanvas=
-    document.createElement("canvas");
-
-  moonCanvas.width=1024;
-  moonCanvas.height=512;
-
-  const ctx=
-    moonCanvas.getContext("2d");
-
-  const gradient=
-    ctx.createLinearGradient(
-      0,0,
-      0,512
-    );
-
-  gradient.addColorStop(
-    0,
-    "#bffcff"
-  );
-
-  gradient.addColorStop(
-    .3,
-    "#00eaff"
-  );
-
-  gradient.addColorStop(
-    .6,
-    "#a855f7"
-  );
-
-  gradient.addColorStop(
-    1,
-    "#ff0077"
-  );
-
-  ctx.fillStyle=gradient;
-  ctx.fillRect(
-    0,0,1024,512
-  );
-
-  /* horizontal scan lines */
-
-  for(let y=280;y<512;y+=18){
-
-    ctx.fillStyle=
-      "rgba(2,2,15,.75)";
-
-    ctx.fillRect(
-      0,
-      y,
-      1024,
-      7
-    );
-  }
-
-  const moonTexture=
-    new THREE.CanvasTexture(
-      moonCanvas
-    );
-
-  const moon=
-    new THREE.Mesh(
-      new THREE.CircleGeometry(
-        105,
-        64
-      ),
-      new THREE.MeshBasicMaterial({
-        map:moonTexture,
-        transparent:true,
-        opacity:.95
-      })
-    );
-
-  moon.position.set(
-    0,
-    70,
-    -500
-  );
-
-  scene.add(moon);
-
-
-  /* HORIZON GLOW */
-
-  const glow=
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        400,
-        100
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0xff0066,
-        transparent:true,
-        opacity:.12
-      })
-    );
-
-  glow.position.set(
-    0,
-    18,
-    -300
-  );
-
-  scene.add(glow);
-
-
-  /* NEON HORIZON GRID */
-
-  for(let i=0;i<22;i++){
-
-    const line=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          300,
-          .08,
-          .08
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            i%2===0
-            ?0x00f0ff
-            :0xff0077,
-          transparent:true,
-          opacity:.25
-        })
-      );
-
-    line.position.set(
-      0,
-      4+i*1.7,
-      -180-i*18
-    );
-
-    scene.add(line);
-  }
-
-
-  /* DISTANT CITY SILHOUETTE */
-
-  for(let i=0;i<90;i++){
-
-    const w=
-      5+Math.random()*15;
-
-    const h=
-      10+Math.random()*80;
-
-    const b=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          w,
-          h,
-          10+Math.random()*20
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            Math.random()>.5
-            ?0x070b22
-            :0x10051d
-        })
-      );
-
-    b.position.set(
-      (Math.random()-.5)*220,
-      h/2,
-      -180-Math.random()*500
-    );
-
-    scene.add(b);
-
-    /* rooftop neon */
-
-    if(Math.random()>.45){
-
-      const roof=
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            w+.2,
-            .15,
-            10
-          ),
-          new THREE.MeshBasicMaterial({
-            color:
-              Math.random()>.5
-              ?0x00f0ff
-              :0xff0077
-          })
-        );
-
-      roof.position.set(
-        b.position.x,
-        h+.1,
-        b.position.z
-      );
-
-      scene.add(roof);
-    }
-  }
-
-
-  /* FLOATING HOLOGRAM RINGS */
-
-  for(let i=0;i<8;i++){
-
-    const ring=
-      new THREE.Mesh(
-        new THREE.TorusGeometry(
-          5+Math.random()*7,
-          .08,
-          8,
-          64
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            i%2
-            ?0xff0077
-            :0x00f0ff,
-          transparent:true,
-          opacity:.4
-        })
-      );
-
-    ring.position.set(
-      (Math.random()-.5)*100,
-      15+Math.random()*70,
-      -120-Math.random()*400
-    );
-
-    ring.rotation.x=
-      Math.random()*Math.PI;
-
-    ring.rotation.y=
-      Math.random()*Math.PI;
-
-    scene.add(ring);
-
-    ring.userData.speed=
-      .2+Math.random()*.5;
-  }
-}
-
-
-/* ---------------- HIGHWAY ---------------- */
-
-function buildHighway(){
-
-  const length=1400;
-
-  const road=
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        28,
-        length
-      ),
-      new THREE.MeshStandardMaterial({
-        color:0x050713,
-        roughness:.3,
-        metalness:.8
-      })
-    );
-
-  road.rotation.x=-Math.PI/2;
-
-  road.position.set(
-    0,
-    0,
-    -length/2+100
-  );
-
-  scene.add(road);
-
-
-  /* ROAD EDGE */
-
-  [-1,1].forEach(side=>{
-
-    const rail=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .35,
-          .6,
-          length
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            side<0
-            ?0xff0077
-            :0x00f0ff
-        })
-      );
-
-    rail.position.set(
-      side*13,
-      .35,
-      -length/2+100
-    );
-
-    scene.add(rail);
-  });
-
-
-  /* LANE LIGHTS */
-
-  const dividers=[
-    -6.4,
-    -3.2,
-    0,
-    3.2,
-    6.4
-  ];
-
-  for(
-    let z=-length+100;
-    z<100;
-    z+=12
-  ){
-
-    dividers.slice(0,4)
-      .forEach((x,i)=>{
-
-        const line=
-          new THREE.Mesh(
-            new THREE.BoxGeometry(
-              .16,
-              .05,
-              5
-            ),
-            new THREE.MeshBasicMaterial({
-              color:
-                i%2===0
-                ?0x00f0ff
-                :0xff0077
-            })
-          );
-
-        line.position.set(
-          x+1.6,
-          .05,
-          z
-        );
-
-        scene.add(line);
-        roadLines.push(line);
-      });
-  }
-
-
-  /* ROAD SIDE LIGHT POSTS */
-
-  for(
-    let z=-1100;
-    z<100;
-    z+=30
-  ){
-
-    [-1,1].forEach(side=>{
-
-      const pole=
-        new THREE.Mesh(
-          new THREE.CylinderGeometry(
-            .08,
-            .08,
-            5,
-            8
-          ),
-          new THREE.MeshBasicMaterial({
-            color:
-              side<0
-              ?0xff0077
-              :0x00f0ff
-          })
-        );
-
-      pole.position.set(
-        side*14,
-        2.5,
-        z
-      );
-
-      scene.add(pole);
-
-      const lamp=
-        new THREE.Mesh(
-          new THREE.SphereGeometry(
-            .22,
-            8,
-            8
-          ),
-          new THREE.MeshBasicMaterial({
-            color:
-              side<0
-              ?0xff0077
-              :0x00f0ff
-          })
-        );
-
-      lamp.position.set(
-        side*14,
-        5,
-        z
-      );
-
-      scene.add(lamp);
-    });
-  }
-}
-
-
-/* ---------------- CITY ---------------- */
-
-function buildCity(){
-
-  for(
-    let z=-1200;
-    z<100;
-    z+=32
-  ){
-
-    [-1,1].forEach(side=>{
-
-      const building=
-        createBuilding(side);
-
-      building.position.set(
-        side*(27+Math.random()*28),
-        0,
-        z+Math.random()*12
-      );
-
-      scene.add(building);
-
-      buildings.push(building);
-    });
-
-    if(Math.random()>.35){
-
-      const board=
-        createBillboard();
-
-      const side=
-        Math.random()>.5?1:-1;
-
-      board.position.set(
-        side*(25+Math.random()*18),
-        16+Math.random()*35,
-        z
-      );
-
-      scene.add(board);
-
-      buildings.push(board);
-    }
-  }
-}
-
-function createBuilding(side){
-
-  const group=
-    new THREE.Group();
-
-  const h=
-    35+Math.random()*120;
-
-  const w=
-    10+Math.random()*18;
-
-  const d=
-    12+Math.random()*20;
-
-  const mat=
-    new THREE.MeshStandardMaterial({
-      color:0x050815,
-      emissive:
-        side<0
-        ?0x120019
-        :0x001520,
-      emissiveIntensity:.35,
-      metalness:.8,
-      roughness:.3
-    });
-
-  const tower=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        w,h,d
-      ),
-      mat
-    );
-
-  tower.position.y=h/2;
-
-  group.add(tower);
-
-
-  /* WINDOW STRIPS */
-
-  for(let y=5;y<h;y+=7){
-
-    const strip=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          w*.75,
-          .18,
-          .08
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            Math.random()>.5
-            ?0x00eaff
-            :0xff0077,
-          transparent:true,
-          opacity:.5
-        })
-      );
-
-    strip.position.set(
-      0,
-      y,
-      -d/2-.05
-    );
-
-    group.add(strip);
-  }
-
-
-  const roof=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        w+.4,
-        .4,
-        d+.4
-      ),
-      new THREE.MeshBasicMaterial({
-        color:
-          side<0
-          ?0xff0077
-          :0x00f0ff
-      })
-    );
-
-  roof.position.y=h;
-
-  group.add(roof);
-
-  return group;
-}
-
-function createBillboard(){
-
-  const group=
-    new THREE.Group();
-
-  const canvas=
-    document.createElement("canvas");
-
-  canvas.width=800;
-  canvas.height=260;
-
-  const ctx=
-    canvas.getContext("2d");
-
-  ctx.fillStyle=
-    "#050719";
-
-  ctx.fillRect(
-    0,0,800,260
-  );
-
-  const pink=
-    Math.random()>.5;
-
-  ctx.strokeStyle=
-    pink
-    ?"rgba(255,0,119,.9)"
-    :"rgba(0,240,255,.9)";
-
-  ctx.lineWidth=12;
-
-  ctx.strokeRect(
-    8,8,784,244
-  );
-
-  ctx.font=
-    "900 58px Orbitron";
-
-  ctx.textAlign="center";
-  ctx.textBaseline="middle";
-
-  ctx.fillStyle=
-    pink
-    ?"rgba(255,100,190,1)"
-    :"rgba(100,255,255,1)";
-
-  const texts=[
-    "NIGHT CITY",
-    "OVERDRIVE",
-    "NEON DISTRICT",
-    "CYBER SPEED",
-    "RUN THE GRID",
-    "2099"
-  ];
-
-  ctx.fillText(
-    texts[Math.floor(Math.random()*texts.length)],
-    400,
-    130
-  );
-
-  const texture=
-    new THREE.CanvasTexture(canvas);
-
-  const mesh=
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        17,
-        5.5
-      ),
-      new THREE.MeshBasicMaterial({
-        map:texture,
-        transparent:true,
-        side:THREE.DoubleSide
-      })
-    );
-
-  group.add(mesh);
-
-  return group;
-}
-
-
-/* ---------------- SPEED PARTICLES ---------------- */
-
-function buildSpeedStreaks(){
-
-  const count=900;
-
-  const geom=
-    new THREE.BufferGeometry();
-
-  const positions=
-    new Float32Array(
-      count*3
-    );
-
-  for(
-    let i=0;
-    i<count*3;
-    i+=3
-  ){
-
-    positions[i]=
-      (Math.random()-.5)*60;
-
-    positions[i+1]=
-      Math.random()*35;
-
-    positions[i+2]=
-      -Math.random()*300;
-  }
-
-  geom.setAttribute(
-    "position",
-    new THREE.BufferAttribute(
-      positions,
-      3
-    )
-  );
-
-  const mat=
-    new THREE.PointsMaterial({
-      color:0x00eaff,
-      size:.3,
-      transparent:true,
-      opacity:.65,
-      blending:THREE.AdditiveBlending
-    });
-
-  rainParticles=
-    new THREE.Points(
-      geom,
-      mat
-    );
-
-  scene.add(rainParticles);
-}
-
-
-/* ---------------- PLAYER ---------------- */
-
-function buildPlayerCar(){
-
-  if(playerGroup){
-    scene.remove(playerGroup);
-  }
-
-  const car=CARS[selectedCarIndex];
-
-  playerGroup=
-    new THREE.Group();
-
-  const body=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.3,.62,4.6
-      ),
-      new THREE.MeshStandardMaterial({
-        color:car.bodyColor,
-        metalness:.95,
-        roughness:.15,
-        emissive:car.bodyColor,
-        emissiveIntensity:.15
-      })
-    );
-
-  body.position.y=.58;
-
-  playerGroup.add(body);
-
-
-  const cockpit=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        1.65,.58,2.1
-      ),
-      new THREE.MeshStandardMaterial({
-        color:0x07111c,
-        metalness:.9,
-        roughness:.05
-      })
-    );
-
-  cockpit.position.set(
-    0,1.05,-.2
-  );
-
-  playerGroup.add(cockpit);
-
-
-  const wing=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.4,.12,.6
-      ),
-      new THREE.MeshStandardMaterial({
-        color:car.accentColor,
-        metalness:.9
-      })
-    );
-
-  wing.position.set(
-    0,1.25,2
-  );
-
-  playerGroup.add(wing);
-
-
-  [-.75,.75].forEach(x=>{
-
-    const light=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .42,.14,.2
-        ),
-        new THREE.MeshBasicMaterial({
-          color:0x00ffff
-        })
-      );
-
-    light.position.set(
-      x,.62,-2.35
-    );
-
-    playerGroup.add(light);
-  });
-
-
-  const tail=
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.1,.15,.15
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0xff0044
-      })
-    );
-
-  tail.position.set(
-    0,.7,2.32
-  );
-
-  playerGroup.add(tail);
-
-
-  const exhaustMat=
-    new THREE.MeshBasicMaterial({
-      color:0x00f0ff,
-      transparent:true,
-      opacity:.85
-    });
-
-  leftExhaust=
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .2,.4,1.4,8
-      ),
-      exhaustMat
-    );
-
-  leftExhaust.rotation.x=Math.PI/2;
-  leftExhaust.position.set(
-    -.6,.45,2.9
-  );
-
-  leftExhaust.visible=false;
-
-  playerGroup.add(leftExhaust);
-
-
-  rightExhaust=
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .2,.4,1.4,8
-      ),
-      exhaustMat
-    );
-
-  rightExhaust.rotation.x=Math.PI/2;
-
-  rightExhaust.position.set(
-    .6,.45,2.9
-  );
-
-  rightExhaust.visible=false;
-
-  playerGroup.add(rightExhaust);
-
-
-  /* wheels */
-
-  const wheelMat=
-    new THREE.MeshStandardMaterial({
-      color:0x020307
-    });
-
-  const rimMat=
-    new THREE.MeshBasicMaterial({
-      color:car.accentColor
-    });
-
-  [
-    [-1.15,.42,-1.4],
-    [1.15,.42,-1.4],
-    [-1.15,.42,1.4],
-    [1.15,.42,1.4]
-  ].forEach(p=>{
-
-    const wg=
-      new THREE.Group();
-
-    wg.position.set(
-      p[0],p[1],p[2]
-    );
-
-    const tire=
-      new THREE.Mesh(
-        new THREE.CylinderGeometry(
-          .44,.44,.28,16
-        ),
-        wheelMat
-      );
-
-    tire.rotation.z=Math.PI/2;
-
-    wg.add(tire);
-
-    const rim=
-      new THREE.Mesh(
-        new THREE.TorusGeometry(
-          .26,.05,8,16
-        ),
-        rimMat
-      );
-
-    rim.rotation.y=Math.PI/2;
-
-    wg.add(rim);
-
-    playerGroup.add(wg);
-  });
-
-
-  underglowLight=
-    new THREE.PointLight(
-      new THREE.Color(car.underglow),
-      3,
-      14
-    );
-
-  underglowLight.position.y=.3;
-
-  playerGroup.add(underglowLight);
-
-
-  playerShield=
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        2.9,24,24
-      ),
-      new THREE.MeshBasicMaterial({
-        color:0x00eaff,
-        wireframe:true,
-        transparent:true,
-        opacity:.3
-      })
-    );
-
-  playerShield.position.y=.8;
-
-  playerGroup.add(playerShield);
-
-
-  playerGroup.position.set(
-    0,0,3
-  );
-
-  scene.add(playerGroup);
-}
-
-
-/* ---------------- TRAFFIC ---------------- */
-
-function spawnTraffic(){
-
-  if(!running||paused)return;
-
-  const lanes=[-2,-1,0,1,2];
-
-  const lane=
-    lanes[
-      Math.floor(
-        Math.random()*lanes.length
-      )
-    ];
-
-  const group=
-    new THREE.Group();
-
-  const isPolice=
-    pursuitActive ||
-    (score>1500&&Math.random()<.2);
-
-  const isTruck=
-    !isPolice&&Math.random()>.75;
-
-  let baseSpeed=
-    85+Math.random()*40;
-
-  let pLights=null;
-
-
-  if(isPolice){
-
-    baseSpeed=
-      120+Math.random()*30;
-
-    const body=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.3,.75,4.8
-        ),
-        new THREE.MeshStandardMaterial({
-          color:0x080912,
-          metalness:.9
-        })
-      );
-
-    body.position.y=.6;
-
-    group.add(body);
-
-
-    const red=
-      new THREE.PointLight(
-        0xff0033,
-        4,
-        25
-      );
-
-    red.position.set(
-      -.6,1.4,0
-    );
-
-    group.add(red);
-
-
-    const blue=
-      new THREE.PointLight(
-        0x0066ff,
-        4,
-        25
-      );
-
-    blue.position.set(
-      .6,1.4,0
-    );
-
-    group.add(blue);
-
-    pLights={
-      r:red,
-      b:blue
-    };
-
-    audio.playSiren();
-
-    const alert=
-      document.getElementById(
-        "policeAlert"
-      );
-
-    alert.classList.remove("hidden");
-    alert.classList.add("flex");
-
-  }else if(isTruck){
-
-    baseSpeed=
-      65+Math.random()*25;
-
-    const cab=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.6,1.8,3
-        ),
-        new THREE.MeshStandardMaterial({
-          color:0x1f2937
-        })
-      );
-
-    cab.position.set(
-      0,1.1,-2.5
-    );
-
-    group.add(cab);
-
-
-    const container=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.6,2.4,5.5
-        ),
-        new THREE.MeshStandardMaterial({
-          color:0x111827
-        })
-      );
-
-    container.position.set(
-      0,1.4,1.5
-    );
-
-    group.add(container);
-
-  }else{
-
-    const colors=[
-      0xff0055,
-      0x00e676,
-      0xffbb00,
-      0x7928ca,
-      0xff3d00,
-      0x00ffff
-    ];
-
-    const body=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          2.1,.8,4.2
-        ),
-        new THREE.MeshStandardMaterial({
-          color:
-            colors[
-              Math.floor(
-                Math.random()*colors.length
-              )
-            ],
-          metalness:.85
-        })
-      );
-
-    body.position.y=.55;
-
-    group.add(body);
-  }
-
-
-  group.position.set(
-    lane*laneWidth,
-    0,
-    -220
-  );
-
-  scene.add(group);
-
-  traffic.push({
-    group,
-    lane,
-    speed:baseSpeed,
-    isPolice,
-    pLights,
-    passed:false,
-    cycle:0
-  });
-}
-
-
-/* ---------------- POWERUPS ---------------- */
-
-function spawnPickup(){
-
-  if(!running||paused)return;
-
-  const lanes=[-2,-1,0,1,2];
-
-  const lane=
-    lanes[
-      Math.floor(
-        Math.random()*lanes.length
-      )
-    ];
-
-  const types=[
-    "nitro",
-    "shield",
-    "credit"
-  ];
-
-  const type=
-    types[
-      Math.floor(
-        Math.random()*types.length
-      )
-    ];
-
-  const group=
-    new THREE.Group();
-
-
-  if(type==="nitro"){
-
-    group.add(
-      new THREE.Mesh(
-        new THREE.OctahedronGeometry(.8),
-        new THREE.MeshBasicMaterial({
-          color:0x00f0ff,
-          wireframe:true
-        })
-      )
-    );
-
-  }else if(type==="shield"){
-
-    group.add(
-      new THREE.Mesh(
-        new THREE.IcosahedronGeometry(.8,1),
-        new THREE.MeshBasicMaterial({
-          color:0x3b82f6
-        })
-      )
-    );
-
-  }else{
-
-    group.add(
-      new THREE.Mesh(
-        new THREE.ConeGeometry(
-          .7,1.3,6
-        ),
-        new THREE.MeshBasicMaterial({
-          color:0xffd700
-        })
-      )
-    );
-  }
-
-
-  group.position.set(
-    lane*laneWidth,
-    1.2,
-    -210
-  );
-
-  scene.add(group);
-
-  pickups.push({
-    group,
-    type,
-    active:true
-  });
-}
-
-
-/* ---------------- CONTROLS ---------------- */
-
-function setupControls(){
-
-  addEventListener(
-    "keydown",
-    e=>{
-      const key=e.key.toLowerCase();
-
-      if(
-        e.key==="ArrowLeft"||
-        key==="a"
-      ){
-        moveLeft();
+      playPickup(type) {
+        if (type === 'nitro') {
+          this.tone(480, 0.08, 'sawtooth', 0.15);
+          setTimeout(() => this.tone(720, 0.12, 'sawtooth', 0.15), 60);
+        } else if (type === 'shield') {
+          this.tone(360, 0.1, 'sine', 0.18);
+          setTimeout(() => this.tone(640, 0.14, 'sine', 0.18), 80);
+        } else if (type === 'credit') {
+          this.tone(880, 0.06, 'triangle', 0.18);
+          setTimeout(() => this.tone(1320, 0.1, 'triangle', 0.18), 50);
+        } else {
+          this.tone(600, 0.08, 'square', 0.14);
+          setTimeout(() => this.tone(1000, 0.12, 'square', 0.14), 70);
+        }
       }
 
-      if(
-        e.key==="ArrowRight"||
-        key==="d"
-      ){
-        moveRight();
+      playNearMiss() {
+        this.tone(700, 0.18, 'sine', 0.22);
+        setTimeout(() => this.tone(1050, 0.12, 'sine', 0.25), 50);
       }
 
-      if(
-        e.key==="ArrowUp"||
-        key==="w"||
-        e.key==="shift"
-      ){
-        setBoost(true);
+      playCrash() {
+        this.stopEngine();
+        this.tone(90, 0.55, 'triangle', 0.4);
+        setTimeout(() => this.tone(45, 0.6, 'sawtooth', 0.35), 40);
       }
 
-      if(e.key===" "||e.key==="Escape"){
-        e.preventDefault();
-        togglePause();
+      playSiren() {
+        this.init();
+        if (this.isMuted || !this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(620, now);
+          osc.frequency.linearRampToValueAtTime(980, now + 0.3);
+          osc.frequency.linearRampToValueAtTime(620, now + 0.6);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.005, now + 0.65);
+          osc.connect(gain).connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.65);
+        } catch(e) {}
       }
-    }
-  );
 
-
-  addEventListener(
-    "keyup",
-    e=>{
-      const key=e.key.toLowerCase();
-
-      if(
-        e.key==="ArrowUp"||
-        key==="w"||
-        key==="shift"
-      ){
-        setBoost(false);
+      playLevelUp() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          setTimeout(() => this.tone(freq, 0.14, 'square', 0.15), idx * 70);
+        });
       }
-    }
-  );
 
-
-  document
-    .getElementById("leftBtn")
-    .addEventListener(
-      "pointerdown",
-      moveLeft
-    );
-
-  document
-    .getElementById("rightBtn")
-    .addEventListener(
-      "pointerdown",
-      moveRight
-    );
-
-
-  const nitroBtn=
-    document.getElementById(
-      "nitroBtn"
-    );
-
-  nitroBtn.addEventListener(
-    "pointerdown",
-    ()=>setBoost(true)
-  );
-
-  nitroBtn.addEventListener(
-    "pointerup",
-    ()=>setBoost(false)
-  );
-
-  nitroBtn.addEventListener(
-    "pointercancel",
-    ()=>setBoost(false)
-  );
-
-  nitroBtn.addEventListener(
-    "pointerleave",
-    ()=>setBoost(false)
-  );
-
-
-  /* TOUCH SWIPE */
-
-  let touchStart=null;
-
-  addEventListener(
-    "touchstart",
-    e=>{
-      if(e.touches.length===1){
-        touchStart={
-          x:e.touches[0].clientX,
-          y:e.touches[0].clientY
+      startMusic() {
+        this.init();
+        if (this.isMuted || !this.ctx || this.musicTimer !== null) return;
+        const bass = [65.41, 65.41, 65.41, 65.41, 77.78, 77.78, 77.78, 77.78, 87.31, 87.31, 87.31, 87.31, 98, 98, 87.31, 77.78];
+        const loop = () => {
+          if (!this.ctx || this.isMuted) return;
+          const step = this.musicStep % 16;
+          this.tone(bass[step], 0.11, 'sawtooth', 0.035);
+          this.musicStep++;
+          this.musicTimer = setTimeout(loop, 140);
         };
-      }
-    },
-    {passive:true}
-  );
-
-  addEventListener(
-    "touchend",
-    e=>{
-      if(!touchStart)return;
-
-      const touch=e.changedTouches[0];
-
-      const dx=
-        touch.clientX-touchStart.x;
-
-      if(
-        Math.abs(dx)>45 &&
-        running &&
-        !paused
-      ){
-        if(dx<0)moveLeft();
-        else moveRight();
+        loop();
       }
 
-      touchStart=null;
-    },
-    {passive:true}
-  );
-}
-
-
-function moveLeft(){
-
-  if(!running||paused)return;
-
-  if(currentLane>-2){
-    currentLane--;
-  }
-
-  targetX=
-    currentLane*laneWidth;
-}
-
-
-function moveRight(){
-
-  if(!running||paused)return;
-
-  if(currentLane<2){
-    currentLane++;
-  }
-
-  targetX=
-    currentLane*laneWidth;
-}
-
-
-function setBoost(value){
-
-  if(!running||paused){
-    isBoosting=false;
-    return;
-  }
-
-  if(value&&nitro>5){
-
-    if(!isBoosting){
-      audio.playNitro();
-      cameraShake=.35;
+      stopMusic() {
+        if (this.musicTimer !== null) {
+          clearTimeout(this.musicTimer);
+          this.musicTimer = null;
+        }
+      }
     }
 
-    isBoosting=true;
-
-  }else{
-
-    isBoosting=false;
-  }
-}
-
-
-/* ---------------- GAME START ---------------- */
-
-function startGame(){
-
-  document
-    .getElementById("startScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("gameOver")
-    .classList.add("hidden");
-
-  document
-    .getElementById("pauseScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("garageScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("hud")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("mobileControls")
-    .classList.remove("hidden");
-
-
-  score=0;
-  distance=0;
-  speed=140;
-  maxSpeed=140;
-  nitro=100;
-  shields=1;
-  combo=1;
-  comboTimer=0;
-
-  currentLane=0;
-  targetX=0;
-
-  spawnTimer=0;
-  pickupTimer=0;
-  pursuitTimer=0;
-
-  pursuitActive=false;
-  isBoosting=false;
-
-
-  traffic.forEach(
-    t=>scene.remove(t.group)
-  );
-
-  traffic=[];
-
-
-  pickups.forEach(
-    p=>scene.remove(p.group)
-  );
-
-  pickups=[];
-
-
-  debrisList.forEach(
-    d=>scene.remove(d.mesh)
-  );
-
-  debrisList=[];
-
-
-  playerGroup.position.set(
-    0,0,3
-  );
-
-  playerShield.visible=true;
-
-  updateShieldUI();
-
-
-  running=true;
-  paused=false;
-
-  audio.startEngine();
-  audio.startMusic();
-}
-
-
-/* ---------------- PAUSE ---------------- */
-
-function togglePause(){
-
-  if(!running)return;
-
-  paused=!paused;
-
-  document
-    .getElementById("pauseScreen")
-    .classList.toggle(
-      "hidden",
-      !paused
-    );
-
-  if(paused){
-
-    audio.stopEngine();
-    isBoosting=false;
-
-  }else{
-
-    audio.startEngine();
-  }
-}
-
-
-/* ---------------- HOME ---------------- */
-
-function home(){
-
-  running=false;
-  paused=false;
-  isBoosting=false;
-
-  audio.stopEngine();
-  audio.stopMusic();
-
-
-  traffic.forEach(
-    t=>scene.remove(t.group)
-  );
-
-  traffic=[];
-
-
-  pickups.forEach(
-    p=>scene.remove(p.group)
-  );
-
-  pickups=[];
-
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-  document
-    .getElementById("mobileControls")
-    .classList.add("hidden");
-
-  document
-    .getElementById("gameOver")
-    .classList.add("hidden");
-
-  document
-    .getElementById("pauseScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("garageScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("startScreen")
-    .classList.remove("hidden");
-}
-
-
-/* ---------------- CRASH ---------------- */
-
-function crash(){
-
-  if(!running)return;
-
-  if(shields>0){
-
-    shields--;
-
-    updateShieldUI();
-
-    cameraShake=.8;
-
-    playerShield.visible=false;
-
-    audio.tone(
-      150,
-      .2,
-      "triangle",
-      .25
-    );
-
-    return;
-  }
-
-
-  running=false;
-  isBoosting=false;
-
-  audio.playCrash();
-
-  cameraShake=1.2;
-
-
-  /* debris */
-
-  for(let i=0;i<25;i++){
-
-    const mesh=
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .5,.4,.5
-        ),
-        new THREE.MeshBasicMaterial({
-          color:
-            Math.random()>.5
-            ?CARS[selectedCarIndex].bodyColor
-            :0xff0044
-        })
-      );
-
-    mesh.position.copy(
-      playerGroup.position
-    );
-
-    scene.add(mesh);
-
-    debrisList.push({
-      mesh,
-      vel:new THREE.Vector3(
-        (Math.random()-.5)*20,
-        5+Math.random()*15,
-        (Math.random()-.5)*20
-      )
-    });
-  }
-
-
-  playerGroup.position.y=-50;
-
-
-  const earned=
-    Math.floor(score/150);
-
-  credits+=earned;
-
-  localStorage.setItem(
-    "np_credits",
-    credits
-  );
-
-
-  const isNew=
-    score>highScore;
-
-  if(isNew){
-
-    highScore=
-      Math.floor(score);
-
-    localStorage.setItem(
-      "np_highscore",
-      highScore
-    );
-
-    document.getElementById(
-      "highScoreText"
-    ).innerText=
-      highScore.toLocaleString()+
-      " PTS";
-
-    if(window.confetti){
-      confetti({
-        particleCount:120,
-        spread:90
+    const sound = new CyberSoundSystem();
+
+    function toggleAudio() {
+      const muted = sound.toggleMute();
+      document.getElementById('btnAudio').textContent = muted ? '🔇' : '🔊';
+      document.getElementById('soundLabel').textContent = muted ? 'SOUND: OFF' : 'SOUND: ON';
+    }
+
+
+    /* =========================================================
+       VEHICLE DATA & GARAGE
+       ========================================================= */
+    const CARS = [
+      {
+        id: 'phantom',
+        name: 'PHANTOM GT-99',
+        classType: 'SYNTH RUNNER',
+        topSpeed: 240,
+        accel: 85,
+        nitroBoost: 85,
+        maxShields: 1,
+        bodyColor: 0x00eaff,
+        accentColor: 0x1e88e5,
+        underglow: '#00eaff',
+        price: 0,
+        unlocked: true
+      },
+      {
+        id: 'valkyrie',
+        name: 'VALKYRIE X-1',
+        classType: 'HYPER INTERCEPTOR',
+        topSpeed: 280,
+        accel: 92,
+        nitroBoost: 105,
+        maxShields: 2,
+        bodyColor: 0xff0077,
+        accentColor: 0xff5599,
+        underglow: '#ff0077',
+        price: 600,
+        unlocked: false
+      },
+      {
+        id: 'titan',
+        name: 'TITAN VANGUARD',
+        classType: 'CYBER DREADNOUGHT',
+        topSpeed: 230,
+        accel: 76,
+        nitroBoost: 125,
+        maxShields: 3,
+        bodyColor: 0xffaa00,
+        accentColor: 0xff7700,
+        underglow: '#ffaa00',
+        price: 1200,
+        unlocked: false
+      },
+      {
+        id: 'ghost',
+        name: 'GHOST APEX-00',
+        classType: 'PROTOTYPE SPECTRE',
+        topSpeed: 310,
+        accel: 98,
+        nitroBoost: 140,
+        maxShields: 2,
+        bodyColor: 0x9d4edd,
+        accentColor: 0xc77dff,
+        underglow: '#a855f7',
+        price: 2500,
+        unlocked: false
+      }
+    ];
+
+    let selectedCarIndex = parseInt(localStorage.getItem('np_car_idx') || '0', 10);
+    let credits = parseInt(localStorage.getItem('np_credits') || '150', 10);
+    let bestScore = parseInt(localStorage.getItem('np_best') || '0', 10);
+
+    const savedUnlocked = JSON.parse(localStorage.getItem('np_unlocked') || '[true,false,false,false]');
+    CARS.forEach((c, i) => { c.unlocked = !!savedUnlocked[i]; });
+
+
+    /* =========================================================
+       THREE.JS ENGINE & GAME STATE
+       ========================================================= */
+    let scene, camera, renderer, clock;
+    let playerGroup, shieldMesh, underglowLight, leftExhaust, rightExhaust;
+
+    let roadLines = [];
+    let buildings = [];
+    let traffic = [];
+    let pickups = [];
+    let debrisList = [];
+    let speedParticles = null;
+    let starParticles = null;
+
+    let running = false;
+    let paused = false;
+    let isBoosting = false;
+
+    let lane = 0;
+    let targetX = 0;
+    const laneWidth = 3.2;
+
+    let score = 0;
+    let distance = 0;
+    let speed = 140;
+    let maxSpeedAchieved = 140;
+    let nitro = 100;
+    let shields = 1;
+    let maxShields = 1;
+    let combo = 1;
+    let comboTimer = 0;
+    let level = 1;
+    let xp = 0;
+    let xpNeeded = 100;
+    let nearMisses = 0;
+    let creditsEarned = 0;
+
+    let policeActive = false;
+    let policeTimer = 0;
+    let spawnTimer = 0;
+    let pickupTimer = 0;
+    let cameraShake = 0;
+    let invulnerableTimer = 0;
+
+    function init() {
+      clock = new THREE.Clock();
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x02050f);
+      scene.fog = new THREE.FogExp2(0x050a1c, 0.007);
+
+      camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 1600);
+      camera.position.set(0, 4.8, 9.8);
+      camera.rotation.x = -0.22;
+
+      renderer = new THREE.WebGLRenderer({
+        canvas: document.getElementById('game'),
+        antialias: true
+      });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0x28184c, 1.2));
+      const cyanDir = new THREE.DirectionalLight(0x00eaff, 1.4);
+      cyanDir.position.set(60, 90, -80);
+      scene.add(cyanDir);
+      const pinkDir = new THREE.DirectionalLight(0xff0066, 1.2);
+      pinkDir.position.set(-60, 70, -60);
+      scene.add(pinkDir);
+
+      buildSky();
+      buildRoad();
+      buildCity();
+      buildSpeedStreaks();
+      buildPlayerCar();
+      setupInput();
+
+      document.getElementById('menuBestScore').textContent = bestScore.toLocaleString() + ' PTS';
+      document.getElementById('menuCredits').textContent = credits.toLocaleString();
+
+      updateGarageUI();
+      animate();
+    }
+
+    function buildSky() {
+      // Starfield
+      const starCount = 1200;
+      const geom = new THREE.BufferGeometry();
+      const pos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount * 3; i += 3) {
+        pos[i] = (Math.random() - 0.5) * 1000;
+        pos[i + 1] = 20 + Math.random() * 300;
+        pos[i + 2] = -150 - Math.random() * 1000;
+      }
+      geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      starParticles = new THREE.Points(geom, new THREE.PointsMaterial({ color: 0x8ceeff, size: 0.75, transparent: true, opacity: 0.8 }));
+      scene.add(starParticles);
+
+      // Striped Sun
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0, '#c2f9ff');
+      grad.addColorStop(0.3, '#00eaff');
+      grad.addColorStop(0.65, '#9d4edd');
+      grad.addColorStop(1, '#ff0077');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1024, 512);
+      for (let y = 260; y < 512; y += 18) {
+        ctx.fillStyle = 'rgba(2, 5, 15, 0.85)';
+        ctx.fillRect(0, y, 1024, 7);
+      }
+      const moonTex = new THREE.CanvasTexture(canvas);
+      const moon = new THREE.Mesh(new THREE.CircleGeometry(110, 64), new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, opacity: 0.95 }));
+      moon.position.set(0, 65, -550);
+      scene.add(moon);
+    }
+
+    function buildRoad() {
+      const length = 1500;
+      const road = new THREE.Mesh(new THREE.PlaneGeometry(30, length), new THREE.MeshStandardMaterial({ color: 0x04060e, roughness: 0.35, metalness: 0.8 }));
+      road.rotation.x = -Math.PI / 2;
+      road.position.set(0, 0, -length / 2 + 100);
+      scene.add(road);
+
+      [-1, 1].forEach(side => {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.65, length), new THREE.MeshBasicMaterial({ color: side < 0 ? 0xff0077 : 0x00eaff }));
+        rail.position.set(side * 14, 0.35, -length / 2 + 100);
+        scene.add(rail);
+      });
+
+      const dividers = [-6.4, -3.2, 0, 3.2, 6.4];
+      for (let z = -length + 100; z < 100; z += 12) {
+        dividers.slice(0, 4).forEach((x, i) => {
+          const line = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 5.2), new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0x00eaff : 0xff0077 }));
+          line.position.set(x + 1.6, 0.04, z);
+          scene.add(line);
+          roadLines.push(line);
+        });
+      }
+    }
+
+    function buildCity() {
+      for (let z = -1200; z < 100; z += 30) {
+        [-1, 1].forEach(side => {
+          const h = 30 + Math.random() * 120;
+          const w = 10 + Math.random() * 18;
+          const d = 12 + Math.random() * 20;
+          const group = new THREE.Group();
+
+          const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({
+            color: 0x040816,
+            emissive: side < 0 ? 0x120018 : 0x001420,
+            emissiveIntensity: 0.35,
+            roughness: 0.4
+          }));
+          b.position.y = h / 2;
+          group.add(b);
+
+          for (let y = 6; y < h; y += 8) {
+            const strip = new THREE.Mesh(new THREE.BoxGeometry(w * 0.75, 0.22, 0.1), new THREE.MeshBasicMaterial({
+              color: Math.random() > 0.5 ? 0x00eaff : 0xff0077,
+              transparent: true,
+              opacity: 0.65
+            }));
+            strip.position.set(0, y, -d / 2 - 0.06);
+            group.add(strip);
+          }
+
+          group.position.set(side * (26 + Math.random() * 30), 0, z + Math.random() * 10);
+          scene.add(group);
+          buildings.push(group);
+        });
+      }
+    }
+
+    function buildSpeedStreaks() {
+      const count = 800;
+      const geom = new THREE.BufferGeometry();
+      const pos = new Float32Array(count * 3);
+      for (let i = 0; i < count * 3; i += 3) {
+        pos[i] = (Math.random() - 0.5) * 60;
+        pos[i + 1] = Math.random() * 30;
+        pos[i + 2] = -Math.random() * 300;
+      }
+      geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      speedParticles = new THREE.Points(geom, new THREE.PointsMaterial({ color: 0x00eaff, size: 0.35, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending }));
+      scene.add(speedParticles);
+    }
+
+    function buildPlayerCar() {
+      if (playerGroup) scene.remove(playerGroup);
+      const c = CARS[selectedCarIndex];
+      maxShields = c.maxShields;
+      shields = c.maxShields;
+
+      playerGroup = new THREE.Group();
+      const bodyMat = new THREE.MeshStandardMaterial({ color: c.bodyColor, metalness: 0.95, roughness: 0.12, emissive: c.bodyColor, emissiveIntensity: 0.15 });
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x04080e, metalness: 0.9, roughness: 0.08 });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f2438, metalness: 0.85, roughness: 0.04 });
+
+      // Body & Nose
+      const lower = new THREE.Mesh(new THREE.BoxGeometry(2.45, 0.58, 4.8), bodyMat);
+      lower.position.y = 0.6;
+      playerGroup.add(lower);
+
+      const nose = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.36, 1.25), bodyMat);
+      nose.position.set(0, 0.72, -2.6);
+      playerGroup.add(nose);
+
+      // Cabin & Glass
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.5, 2.1), darkMat);
+      cabin.position.set(0, 1.05, 0.05);
+      playerGroup.add(cabin);
+
+      const wind = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.35, 0.12), glassMat);
+      wind.position.set(0, 1.18, -0.92);
+      wind.rotation.x = -0.28;
+      playerGroup.add(wind);
+
+      // Wing
+      const wing = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.12, 0.6), new THREE.MeshStandardMaterial({ color: c.accentColor, metalness: 0.9 }));
+      wing.position.set(0, 1.38, 2.05);
+      playerGroup.add(wing);
+
+      // Lights
+      [-0.75, 0.75].forEach(x => {
+        const l = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.14, 0.16), new THREE.MeshBasicMaterial({ color: 0xe6ffff }));
+        l.position.set(x, 0.65, -3.15);
+        playerGroup.add(l);
+      });
+
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.14, 0.16), new THREE.MeshBasicMaterial({ color: 0xff0044 }));
+      tail.position.set(0, 0.75, 2.45);
+      playerGroup.add(tail);
+
+      // Wheels
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x010204, roughness: 0.4 });
+      const rimMat = new THREE.MeshBasicMaterial({ color: c.accentColor });
+      [[-1.25, 0.44, -1.55], [1.25, 0.44, -1.55], [-1.25, 0.44, 1.55], [1.25, 0.44, 1.55]].forEach(p => {
+        const g = new THREE.Group();
+        g.position.set(...p);
+        const t = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.34, 18), tireMat);
+        t.rotation.z = Math.PI / 2;
+        g.add(t);
+        const r = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.055, 8, 18), rimMat);
+        r.rotation.y = Math.PI / 2;
+        g.add(r);
+        playerGroup.add(g);
+      });
+
+      // Underglow
+      underglowLight = new THREE.PointLight(new THREE.Color(c.underglow), 4.5, 16);
+      underglowLight.position.set(0, 0.25, 0);
+      playerGroup.add(underglowLight);
+
+      // Nitro exhaust cones
+      const exMat = new THREE.MeshBasicMaterial({ color: 0x00eaff, transparent: true, opacity: 0.85 });
+      leftExhaust = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.1, 8), exMat);
+      leftExhaust.rotation.x = -Math.PI / 2;
+      leftExhaust.position.set(-0.65, 0.55, 2.9);
+      leftExhaust.visible = false;
+      playerGroup.add(leftExhaust);
+
+      rightExhaust = new THREE.Mesh(new THREE.ConeGeometry(0.22, 1.1, 8), exMat);
+      rightExhaust.rotation.x = -Math.PI / 2;
+      rightExhaust.position.set(0.65, 0.55, 2.9);
+      rightExhaust.visible = false;
+      playerGroup.add(rightExhaust);
+
+      // Shield
+      shieldMesh = new THREE.Mesh(new THREE.SphereGeometry(3.0, 24, 24), new THREE.MeshBasicMaterial({ color: 0x00eaff, wireframe: true, transparent: true, opacity: 0.35 }));
+      shieldMesh.position.y = 0.8;
+      playerGroup.add(shieldMesh);
+
+      playerGroup.position.set(0, 0, 3);
+      scene.add(playerGroup);
+    }
+
+    function spawnTraffic() {
+      if (!running || paused) return;
+      const lanes = [-2, -1, 0, 1, 2];
+      const l = lanes[Math.floor(Math.random() * lanes.length)];
+      const group = new THREE.Group();
+
+      const isPolice = policeActive || (score > 1200 && Math.random() < 0.22);
+      const isTruck = !isPolice && Math.random() < 0.2;
+      let baseSpeed = 90 + Math.random() * 45;
+      let policeLights = null;
+
+      if (isPolice) {
+        baseSpeed = 135 + Math.random() * 35;
+        const b = new THREE.Mesh(new THREE.BoxGeometry(2.35, 0.75, 4.6), new THREE.MeshStandardMaterial({ color: 0x090b14, metalness: 0.9 }));
+        b.position.y = 0.6;
+        group.add(b);
+
+        const red = new THREE.PointLight(0xff0033, 4, 25);
+        red.position.set(-0.6, 1.35, 0);
+        group.add(red);
+        const blue = new THREE.PointLight(0x0066ff, 4, 25);
+        blue.position.set(0.6, 1.35, 0);
+        group.add(blue);
+        policeLights = { r: red, b: blue };
+        sound.playSiren();
+      } else if (isTruck) {
+        baseSpeed = 70 + Math.random() * 25;
+        const cab = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.8, 2.8), new THREE.MeshStandardMaterial({ color: 0x1f2937 }));
+        cab.position.set(0, 1.1, -2.4);
+        group.add(cab);
+
+        const container = new THREE.Mesh(new THREE.BoxGeometry(2.7, 2.3, 5.2), new THREE.MeshStandardMaterial({ color: 0x111827 }));
+        container.position.set(0, 1.4, 1.6);
+        group.add(container);
+      } else {
+        const colors = [0xff0055, 0x00e676, 0xffbb00, 0x7928ca, 0xff3d00, 0x00eaff];
+        const b = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.8, 4.3), new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random() * colors.length)], metalness: 0.85 }));
+        b.position.y = 0.55;
+        group.add(b);
+      }
+
+      group.position.set(l * laneWidth, 0, -230 - Math.random() * 30);
+      scene.add(group);
+      traffic.push({ group, lane: l, speed: baseSpeed, isPolice, policeLights, passed: false, cycle: 0 });
+    }
+
+    function spawnPickup() {
+      if (!running || paused) return;
+      const lanes = [-2, -1, 0, 1, 2];
+      const l = lanes[Math.floor(Math.random() * lanes.length)];
+      const roll = Math.random();
+      const type = roll < 0.35 ? 'nitro' : roll < 0.62 ? 'shield' : roll < 0.85 ? 'credit' : 'xp';
+      const color = type === 'nitro' ? 0x00eaff : type === 'shield' ? 0x3b82f6 : type === 'credit' ? 0xffd700 : 0xa855f7;
+
+      const group = new THREE.Group();
+      if (type === 'nitro') {
+        group.add(new THREE.Mesh(new THREE.OctahedronGeometry(0.8), new THREE.MeshBasicMaterial({ color, wireframe: true })));
+      } else if (type === 'shield') {
+        group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.8, 1), new THREE.MeshBasicMaterial({ color })));
+      } else if (type === 'credit') {
+        group.add(new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.4, 6), new THREE.MeshBasicMaterial({ color })));
+      } else {
+        group.add(new THREE.Mesh(new THREE.DodecahedronGeometry(0.75), new THREE.MeshBasicMaterial({ color, wireframe: true })));
+      }
+      group.add(new THREE.PointLight(color, 2.5, 8));
+      group.position.set(l * laneWidth, 1.2, -220);
+      scene.add(group);
+      pickups.push({ group, type, active: true });
+    }
+
+    function moveLeft() {
+      if (!running || paused) return;
+      if (lane > -2) {
+        lane--;
+        targetX = lane * laneWidth;
+        sound.tone(280, 0.04, 'square', 0.1);
+      }
+    }
+
+    function moveRight() {
+      if (!running || paused) return;
+      if (lane < 2) {
+        lane++;
+        targetX = lane * laneWidth;
+        sound.tone(340, 0.04, 'square', 0.1);
+      }
+    }
+
+    function setBoost(active) {
+      if (!running || paused) {
+        isBoosting = false;
+        return;
+      }
+      if (active && nitro > 4) {
+        if (!isBoosting) {
+          sound.playNitro();
+          cameraShake = 0.35;
+        }
+        isBoosting = true;
+      } else {
+        isBoosting = false;
+      }
+    }
+
+    function setupInput() {
+      window.addEventListener('keydown', e => {
+        const k = e.key.toLowerCase();
+        if (e.key === 'ArrowLeft' || k === 'a') moveLeft();
+        if (e.key === 'ArrowRight' || k === 'd') moveRight();
+        if (e.key === 'ArrowUp' || k === 'w' || e.key === 'Shift') setBoost(true);
+        if (e.key === 'Escape' || e.key === ' ') { e.preventDefault(); togglePause(); }
+      });
+
+      window.addEventListener('keyup', e => {
+        const k = e.key.toLowerCase();
+        if (e.key === 'ArrowUp' || k === 'w' || e.key === 'Shift') setBoost(false);
+      });
+
+      document.getElementById('btnLeft').addEventListener('pointerdown', moveLeft);
+      document.getElementById('btnRight').addEventListener('pointerdown', moveRight);
+
+      const nb = document.getElementById('btnNitro');
+      nb.addEventListener('pointerdown', () => setBoost(true));
+      nb.addEventListener('pointerup', () => setBoost(false));
+      nb.addEventListener('pointerleave', () => setBoost(false));
+
+      let startX = 0, startY = 0;
+      window.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', e => {
+        if (!running || paused) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > 35 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) moveLeft();
+          else moveRight();
+        }
+      }, { passive: true });
+
+      window.addEventListener('resize', () => {
+        if (!camera || !renderer) return;
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
       });
     }
-  }
 
-
-  document.getElementById(
-    "creditDisplay"
-  ).innerText=credits;
-
-
-  setTimeout(()=>{
-
-    document
-      .getElementById("gameOver")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("hud")
-      .classList.add("hidden");
-
-    document
-      .getElementById("mobileControls")
-      .classList.add("hidden");
-
-
-    document.getElementById(
-      "finalScore"
-    ).innerText=
-      Math.floor(score).toLocaleString();
-
-    document.getElementById(
-      "finalDistance"
-    ).innerText=
-      Math.floor(distance)+" M";
-
-    document.getElementById(
-      "finalSpeed"
-    ).innerText=
-      Math.floor(maxSpeed)+" KM/H";
-
-    document.getElementById(
-      "finalCredits"
-    ).innerText=
-      "+"+earned+" CREDITS";
-
-    document
-      .getElementById("newRecordBadge")
-      .classList.toggle(
-        "hidden",
-        !isNew
-      );
-
-  },700);
-}
-
-
-/* ---------------- GARAGE ---------------- */
-
-function openGarage(){
-
-  document
-    .getElementById("startScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("garageScreen")
-    .classList.remove("hidden");
-
-  updateGarageUI();
-}
-
-
-function closeGarage(){
-
-  document
-    .getElementById("garageScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("startScreen")
-    .classList.remove("hidden");
-}
-
-
-function updateGarageUI(){
-
-  const c=CARS[selectedCarIndex];
-
-  document.getElementById(
-    "garageCredits"
-  ).innerText=credits;
-
-  document.getElementById(
-    "garageCarName"
-  ).innerText=c.name;
-
-  document.getElementById(
-    "garageCarClass"
-  ).innerText=c.classType;
-
-  document.getElementById(
-    "statSpeed"
-  ).innerText=
-    c.topSpeed+" KM/H";
-
-  document.getElementById(
-    "barSpeed"
-  ).style.width=
-    Math.min(
-      100,
-      c.topSpeed/300*100
-    )+"%";
-
-  document.getElementById(
-    "statAccel"
-  ).innerText=
-    c.accel+"%";
-
-  document.getElementById(
-    "barAccel"
-  ).style.width=
-    c.accel+"%";
-
-  document.getElementById(
-    "statNitro"
-  ).innerText=
-    "+"+c.nitroBoost+" KM/H";
-
-  document.getElementById(
-    "barNitro"
-  ).style.width=
-    Math.min(
-      100,
-      c.nitroBoost/140*100
-    )+"%";
-
-
-  const btn=
-    document.getElementById(
-      "garageSelectBtn"
-    );
-
-
-  if(c.unlocked){
-
-    btn.innerText=
-      "DEPLOY MACHINE";
-
-    btn.disabled=false;
-
-    btn.className=
-      "pointer-auto flex-1 py-3 rounded-xl bg-cyan-500 text-black font-cyber font-black";
-
-  }else{
-
-    btn.innerText=
-      "UNLOCK ("+
-      c.price+
-      " CREDITS)";
-
-    btn.disabled=
-      credits<c.price;
-
-    btn.className=
-      credits>=c.price
-      ?"pointer-auto flex-1 py-3 rounded-xl bg-amber-500 text-black font-cyber font-black"
-      :"pointer-auto flex-1 py-3 rounded-xl bg-slate-800 text-slate-500 font-cyber font-black";
-  }
-
-
-  document.getElementById(
-    "menuCarName"
-  ).innerText=c.name;
-
-
-  buildPlayerCar();
-}
-
-
-function prevCar(){
-
-  selectedCarIndex=
-    selectedCarIndex>0
-    ?selectedCarIndex-1
-    :CARS.length-1;
-
-  localStorage.setItem(
-    "np_selectedCar",
-    selectedCarIndex
-  );
-
-  updateGarageUI();
-}
-
-
-function nextCar(){
-
-  selectedCarIndex=
-    selectedCarIndex<CARS.length-1
-    ?selectedCarIndex+1
-    :0;
-
-  localStorage.setItem(
-    "np_selectedCar",
-    selectedCarIndex
-  );
-
-  updateGarageUI();
-}
-
-
-function selectCarAction(){
-
-  const c=CARS[selectedCarIndex];
-
-  if(c.unlocked){
-
-    localStorage.setItem(
-      "np_selectedCar",
-      selectedCarIndex
-    );
-
-    closeGarage();
-
-  }else if(credits>=c.price){
-
-    credits-=c.price;
-
-    c.unlocked=true;
-
-    const unlocked=
-      CARS.map(x=>x.unlocked);
-
-    localStorage.setItem(
-      "np_unlockedCars",
-      JSON.stringify(unlocked)
-    );
-
-    localStorage.setItem(
-      "np_credits",
-      credits
-    );
-
-    updateGarageUI();
-  }
-}
-
-
-function setCarUnderglow(col){
-
-  CARS[selectedCarIndex].underglow=col;
-
-  buildPlayerCar();
-}
-
-
-/* ---------------- SHIELD UI ---------------- */
-
-function updateShieldUI(){
-
-  const container=
-    document.getElementById(
-      "shieldPills"
-    );
-
-  container.innerHTML="";
-
-  for(let i=0;i<shields;i++){
-
-    const pill=
-      document.createElement("span");
-
-    pill.className=
-      "w-3 h-3 rounded bg-blue-500 border border-blue-300 shadow-[0_0_8px_#3b82f6]";
-
-    container.appendChild(pill);
-  }
-
-  if(shields===0){
-
-    const empty=
-      document.createElement("span");
-
-    empty.className=
-      "text-[9px] text-slate-500 font-cyber";
-
-    empty.innerText="EMPTY";
-
-    container.appendChild(empty);
-  }
-}
-
-
-/* ---------------- UPDATE ---------------- */
-
-function update(delta){
-
-  const car=CARS[selectedCarIndex];
-
-
-  let targetSpeed=car.topSpeed;
-
-  if(isBoosting&&nitro>0){
-
-    targetSpeed+=car.nitroBoost;
-
-    nitro=
-      Math.max(
-        0,
-        nitro-delta*30
-      );
-
-    if(nitro<=0){
-      isBoosting=false;
+    function startGame() {
+      sound.init();
+      ['startScreen', 'garageScreen', 'pauseScreen', 'gameOverScreen'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById('hud').classList.remove('hidden');
+      document.getElementById('mobileControls').classList.remove('hidden');
+
+      score = 0;
+      distance = 0;
+      speed = 140;
+      maxSpeedAchieved = 140;
+      nitro = 100;
+      shields = CARS[selectedCarIndex].maxShields;
+      maxShields = shields;
+      combo = 1;
+      comboTimer = 0;
+      level = 1;
+      xp = 0;
+      xpNeeded = 100;
+      nearMisses = 0;
+      creditsEarned = 0;
+      policeActive = false;
+      policeTimer = 0;
+      lane = 0;
+      targetX = 0;
+
+      traffic.forEach(t => scene.remove(t.group));
+      traffic = [];
+      pickups.forEach(p => scene.remove(p.group));
+      pickups = [];
+
+      playerGroup.position.set(0, 0, 3);
+      shieldMesh.visible = true;
+
+      running = true;
+      paused = false;
+
+      sound.startEngine();
+      sound.startMusic();
     }
 
-  }else{
-
-    nitro=
-      Math.min(
-        100,
-        nitro+delta*3.5
-      );
-  }
-
-
-  speed+=
-    (targetSpeed-speed)*
-    Math.min(
-      1,
-      delta*
-      (isBoosting?4.5:1.8)
-    );
-
-
-  maxSpeed=
-    Math.max(
-      maxSpeed,
-      speed
-    );
-
-
-  audio.updateEngine(
-    speed/330,
-    isBoosting
-  );
-
-
-  if(leftExhaust&&rightExhaust){
-
-    leftExhaust.visible=
-      isBoosting;
-
-    rightExhaust.visible=
-      isBoosting;
-  }
-
-
-  const forwardStep=
-    speed*.28*delta;
-
-  distance+=forwardStep;
-
-  score+=
-    speed*
-    .2*
-    (isBoosting?2.5:1)*
-    delta*
-    combo;
-
-
-  if(comboTimer>0){
-
-    comboTimer-=delta;
-
-    if(comboTimer<=0){
-      combo=1;
-    }
-  }
-
-
-  /* PURSUIT */
-
-  pursuitTimer+=delta;
-
-  if(
-    pursuitTimer>35 &&
-    !pursuitActive
-  ){
-
-    pursuitActive=true;
-    pursuitTimer=0;
-
-  }else if(
-    pursuitTimer>25 &&
-    pursuitActive
-  ){
-
-    pursuitActive=false;
-    pursuitTimer=0;
-
-    const alert=
-      document.getElementById(
-        "policeAlert"
-      );
-
-    alert.classList.add("hidden");
-    alert.classList.remove("flex");
-  }
-
-
-  /* STEERING */
-
-  const dx=
-    targetX-
-    playerGroup.position.x;
-
-  playerGroup.position.x+=
-    dx*
-    Math.min(
-      1,
-      delta*14
-    );
-
-  playerGroup.rotation.z=
-    -dx*.08;
-
-
-  /* CAMERA */
-
-  camera.position.x+=
-    (
-      playerGroup.position.x*.25-
-      camera.position.x
-    )*
-    delta*8;
-
-
-  const targetFov=
-    isBoosting?82:65;
-
-  camera.fov+=
-    (
-      targetFov-camera.fov
-    )*
-    delta*5;
-
-  camera.updateProjectionMatrix();
-
-
-  if(cameraShake>0){
-
-    camera.position.x+=
-      (Math.random()-.5)*
-      cameraShake;
-
-    camera.position.y=
-      5+
-      (Math.random()-.5)*
-      cameraShake;
-
-    cameraShake=
-      Math.max(
-        0,
-        cameraShake-delta*2.5
-      );
-
-  }else{
-
-    camera.position.y=5;
-  }
-
-
-  /* ROAD */
-
-  const roadMovement=
-    (
-      speed*.065+12
-    )*delta;
-
-
-  roadLines.forEach(line=>{
-
-    line.position.z+=roadMovement;
-
-    if(line.position.z>20){
-      line.position.z-=1200;
-    }
-  });
-
-
-  buildings.forEach(building=>{
-
-    building.position.z+=
-      roadMovement;
-
-    if(building.position.z>60){
-      building.position.z-=1200;
-    }
-  });
-
-
-  /* SPAWN */
-
-  spawnTimer+=delta;
-
-  if(
-    spawnTimer>
-    Math.max(
-      .45,
-      1.2-score/5000
-    )
-  ){
-
-    spawnTraffic();
-
-    spawnTimer=0;
-  }
-
-
-  pickupTimer+=delta;
-
-  if(pickupTimer>4.5){
-
-    spawnPickup();
-
-    pickupTimer=0;
-  }
-
-
-  /* TRAFFIC */
-
-  for(
-    let i=traffic.length-1;
-    i>=0;
-    i--
-  ){
-
-    const t=traffic[i];
-
-    t.group.position.z+=
-      (
-        (speed-t.speed)*.065+
-        8
-      )*delta;
-
-
-    if(t.isPolice&&t.pLights){
-
-      t.cycle+=delta*15;
-
-      const flash=
-        Math.sin(t.cycle)>0;
-
-      t.pLights.r.intensity=
-        flash?5:.2;
-
-      t.pLights.b.intensity=
-        flash?.2:5;
-    }
-
-
-    /* near miss */
-
-    if(
-      !t.passed&&
-      t.group.position.z>
-      playerGroup.position.z-2.5
-    ){
-
-      const lat=
-        Math.abs(
-          t.group.position.x-
-          playerGroup.position.x
-        );
-
-      if(
-        lat<2.8&&
-        lat>1.8
-      ){
-
-        t.passed=true;
-
-        combo=
-          Math.min(
-            6,
-            combo+1
-          );
-
-        comboTimer=4;
-
-        nitro=
-          Math.min(
-            100,
-            nitro+18
-          );
-
-        const bonus=
-          250*combo;
-
-        score+=bonus;
-
-        audio.playNearMiss();
-
-
-        const toast=
-          document.getElementById(
-            "nearMissToast"
-          );
-
-        document.getElementById(
-          "nearMissText"
-        ).innerText=
-          "⚡ NEAR MISS! +"+
-          bonus+
-          " ("+
-          combo+
-          "X)";
-
-        toast.classList.remove(
-          "hidden"
-        );
-
-        setTimeout(()=>{
-          toast.classList.add(
-            "hidden"
-          );
-        },1000);
-
-      }else{
-
-        t.passed=true;
+    function togglePause() {
+      if (!running) return;
+      paused = !paused;
+      document.getElementById('pauseScreen').classList.toggle('hidden', !paused);
+      if (paused) {
+        isBoosting = false;
+        sound.stopEngine();
+      } else {
+        sound.startEngine();
       }
     }
 
+    function goHome() {
+      running = false;
+      paused = false;
+      isBoosting = false;
+      sound.stopEngine();
+      sound.stopMusic();
 
-    /* collision */
-
-    const cx=
-      Math.abs(
-        playerGroup.position.x-
-        t.group.position.x
-      );
-
-    const cz=
-      Math.abs(
-        playerGroup.position.z-
-        t.group.position.z
-      );
-
-
-    if(
-      cx<1.95&&
-      cz<3.8
-    ){
-
-      crash();
-
-      break;
+      ['hud', 'mobileControls', 'pauseScreen', 'gameOverScreen', 'garageScreen'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById('startScreen').classList.remove('hidden');
     }
 
-
-    if(t.group.position.z>25){
-
-      scene.remove(t.group);
-
-      traffic.splice(i,1);
-    }
-  }
-
-
-  /* POWERUPS */
-
-  for(
-    let i=pickups.length-1;
-    i>=0;
-    i--
-  ){
-
-    const p=pickups[i];
-
-    p.group.position.z+=
-      roadMovement;
-
-    p.group.rotation.y+=
-      delta*3;
-
-
-    if(
-      playerGroup.position.distanceTo(
-        p.group.position
-      )<2.5&&
-      p.active
-    ){
-
-      p.active=false;
-
-      audio.playPickup();
-
-
-      if(p.type==="nitro"){
-        nitro=100;
+    function crash() {
+      if (!running) return;
+      if (shields > 0) {
+        shields--;
+        shieldMesh.visible = shields > 0;
+        cameraShake = 0.85;
+        invulnerableTimer = 1.0;
+        sound.playCrash();
+        return;
       }
 
-      if(p.type==="shield"){
+      running = false;
+      isBoosting = false;
+      cameraShake = 1.4;
+      sound.playCrash();
 
-        shields=
-          Math.min(
-            2,
-            shields+1
-          );
-
-        playerShield.visible=true;
-
-        updateShieldUI();
+      const final = Math.floor(score);
+      const isNew = final > bestScore;
+      if (isNew) {
+        bestScore = final;
+        localStorage.setItem('np_best', bestScore);
+        document.getElementById('menuBestScore').textContent = bestScore.toLocaleString() + ' PTS';
+        if (window.confetti) confetti({ particleCount: 120, spread: 80 });
       }
 
-      if(p.type==="credit"){
+      const totalEarned = creditsEarned + Math.floor(final / 180);
+      credits += totalEarned;
+      localStorage.setItem('np_credits', credits);
+      document.getElementById('menuCredits').textContent = credits.toLocaleString();
 
-        score+=300;
-        credits+=50;
+      document.getElementById('finalScore').textContent = final.toLocaleString();
+      document.getElementById('finalDistance').textContent = Math.floor(distance) + ' M';
+      document.getElementById('finalSpeed').textContent = Math.floor(maxSpeedAchieved) + ' KM/H';
+      document.getElementById('finalNearMisses').textContent = nearMisses;
+      document.getElementById('finalCredits').textContent = '+' + totalEarned + ' SHARDS';
+      document.getElementById('recordBadge').classList.toggle('hidden', !isNew);
 
-        localStorage.setItem(
-          "np_credits",
-          credits
-        );
+      setTimeout(() => {
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('mobileControls').classList.add('hidden');
+        document.getElementById('gameOverScreen').classList.remove('hidden');
+      }, 650);
+    }
 
-        document.getElementById(
-          "creditDisplay"
-        ).innerText=credits;
+    function update(dt) {
+      if (invulnerableTimer > 0) {
+        invulnerableTimer -= dt;
+        playerGroup.visible = Math.floor(performance.now() / 80) % 2 === 0;
+      } else {
+        playerGroup.visible = true;
       }
 
+      const c = CARS[selectedCarIndex];
+      const diff = Math.min(2.5, 1 + distance / 2800);
+      let targetSpeed = c.topSpeed * (0.68 + 0.32 * diff);
 
-      scene.remove(p.group);
-
-      pickups.splice(i,1);
-
-      continue;
-    }
-
-
-    if(p.group.position.z>20){
-
-      scene.remove(p.group);
-
-      pickups.splice(i,1);
-    }
-  }
-
-
-  /* HUD */
-
-  document.getElementById(
-    "speedText"
-  ).innerHTML=
-    Math.floor(speed)+
-    ' <span class="text-xs text-cyan-300 font-normal">KM/H</span>';
-
-
-  document.getElementById(
-    "scoreText"
-  ).childNodes[0].nodeValue=
-    Math.floor(score)
-      .toLocaleString()+
-    " ";
-
-
-  document.getElementById(
-    "distanceText"
-  ).innerText=
-    Math.floor(distance)+" M";
-
-
-  document.getElementById(
-    "nitroBar"
-  ).style.width=
-    Math.floor(nitro)+"%";
-
-
-  document.getElementById(
-    "nitroPercent"
-  ).innerText=
-    Math.floor(nitro)+"%";
-
-
-  const comboBadge=
-    document.getElementById(
-      "comboBadge"
-    );
-
-
-  if(combo>1){
-
-    comboBadge.innerText=
-      combo+"X";
-
-    comboBadge.classList.remove(
-      "hidden"
-    );
-
-  }else{
-
-    comboBadge.classList.add(
-      "hidden"
-    );
-  }
-}
-
-
-/* ---------------- ANIMATION ---------------- */
-
-function animate(){
-
-  requestAnimationFrame(animate);
-
-  const delta=
-    Math.min(
-      clock.getDelta(),
-      .05
-    );
-
-
-  if(running&&!paused){
-    update(delta);
-  }
-
-
-  /* rain */
-
-  if(rainParticles){
-
-    const pos=
-      rainParticles
-        .geometry
-        .attributes
-        .position;
-
-    const move=
-      (speed*.12+25)*delta;
-
-    for(
-      let i=0;
-      i<pos.count;
-      i++
-    ){
-
-      let z=
-        pos.getZ(i)+move;
-
-      if(z>15){
-
-        z=-300;
-
-        pos.setX(
-          i,
-          (Math.random()-.5)*60
-        );
-
-        pos.setY(
-          i,
-          Math.random()*35
-        );
+      if (isBoosting && nitro > 0) {
+        targetSpeed += c.nitroBoost;
+        nitro = Math.max(0, nitro - dt * 36);
+        if (nitro <= 0) isBoosting = false;
+      } else {
+        nitro = Math.min(100, nitro + dt * 3.0);
       }
 
-      pos.setZ(i,z);
+      speed += (targetSpeed - speed) * Math.min(1, dt * (isBoosting ? 4.8 : 2.2));
+      maxSpeedAchieved = Math.max(maxSpeedAchieved, speed);
+      sound.updateEngine(speed / 330, isBoosting);
+
+      if (leftExhaust && rightExhaust) {
+        leftExhaust.visible = isBoosting;
+        rightExhaust.visible = isBoosting;
+      }
+
+      const forward = speed * 0.26 * dt;
+      distance += forward;
+      score += speed * 0.18 * (isBoosting ? 2.4 : 1.0) * dt * combo;
+
+      // XP & Level
+      xp += speed * 0.005 * dt;
+      if (xp >= xpNeeded) {
+        xp -= xpNeeded;
+        level++;
+        xpNeeded = Math.floor(100 + level * 45);
+        score += 1000;
+        sound.playLevelUp();
+      }
+
+      if (comboTimer > 0) {
+        comboTimer -= dt;
+        if (comboTimer <= 0) combo = 1;
+      }
+
+      // Police cycle
+      policeTimer += dt;
+      if (!policeActive && policeTimer > 28 + level * 1.5) {
+        policeActive = true;
+        policeTimer = 0;
+        sound.playSiren();
+      } else if (policeActive && policeTimer > 22) {
+        policeActive = false;
+        policeTimer = 0;
+      }
+
+      // Steering
+      const dx = targetX - playerGroup.position.x;
+      playerGroup.position.x += dx * Math.min(1, dt * 13.5);
+      playerGroup.rotation.z = -dx * 0.07;
+      camera.position.x += (playerGroup.position.x * 0.25 - camera.position.x) * dt * 8;
+
+      const targetFov = isBoosting ? 82 : 65;
+      camera.fov += (targetFov - camera.fov) * dt * 5;
+      camera.updateProjectionMatrix();
+
+      if (cameraShake > 0) {
+        camera.position.x += (Math.random() - 0.5) * cameraShake;
+        camera.position.y = 4.8 + (Math.random() - 0.5) * cameraShake;
+        cameraShake = Math.max(0, cameraShake - dt * 2.6);
+      } else {
+        camera.position.y = 4.8;
+      }
+
+      // Road scroll
+      const roadMove = (speed * 0.062 + 10) * dt;
+      roadLines.forEach(l => {
+        l.position.z += roadMove;
+        if (l.position.z > 25) l.position.z -= 1400;
+      });
+      buildings.forEach(b => {
+        b.position.z += roadMove * 0.85;
+        if (b.position.z > 60) b.position.z -= 1300;
+      });
+
+      // Spawning
+      spawnTimer += dt;
+      if (spawnTimer > Math.max(0.35, 1.15 - score / 6000)) {
+        spawnTraffic();
+        spawnTimer = 0;
+      }
+
+      pickupTimer += dt;
+      if (pickupTimer > 4.2) {
+        spawnPickup();
+        pickupTimer = 0;
+      }
+
+      // Traffic
+      for (let i = traffic.length - 1; i >= 0; i--) {
+        const t = traffic[i];
+        t.group.position.z += ((speed - t.speed) * 0.055 + 8) * dt;
+
+        if (t.isPolice && t.policeLights) {
+          t.cycle += dt * 16;
+          const flash = Math.sin(t.cycle) > 0;
+          t.policeLights.r.intensity = flash ? 5 : 0.2;
+          t.policeLights.b.intensity = flash ? 0.2 : 5;
+        }
+
+        const cx = Math.abs(playerGroup.position.x - t.group.position.x);
+        const cz = Math.abs(playerGroup.position.z - t.group.position.z);
+
+        if (!t.passed && t.group.position.z > playerGroup.position.z - 2.2) {
+          t.passed = true;
+          if (cx > 1.6 && cx < 3.0) {
+            combo = Math.min(8, combo + 1);
+            comboTimer = 3.8;
+            nearMisses++;
+            nitro = Math.min(100, nitro + 16);
+            const bonus = 280 * combo;
+            score += bonus;
+            sound.playNearMiss();
+
+            const toast = document.getElementById('nearMissToast');
+            document.getElementById('nearMissText').textContent = '⚡ NEAR MISS! +' + bonus + ' PTS (' + combo.toFixed(1) + 'x)';
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 1200);
+          }
+        }
+
+        if (invulnerableTimer <= 0 && cx < 1.95 && cz < 3.9) {
+          crash();
+          break;
+        }
+
+        if (t.group.position.z > 30) {
+          scene.remove(t.group);
+          traffic.splice(i, 1);
+        }
+      }
+
+      // Pickups
+      for (let i = pickups.length - 1; i >= 0; i--) {
+        const p = pickups[i];
+        p.group.position.z += roadMove;
+        p.group.rotation.y += dt * 3.2;
+
+        if (p.active && playerGroup.position.distanceTo(p.group.position) < 2.5) {
+          p.active = false;
+          sound.playPickup(p.type);
+          if (p.type === 'nitro') nitro = 100;
+          if (p.type === 'shield') {
+            shields = Math.min(maxShields, shields + 1);
+            shieldMesh.visible = true;
+          }
+          if (p.type === 'credit') creditsEarned += 60;
+          if (p.type === 'xp') xp += 45;
+          scene.remove(p.group);
+          pickups.splice(i, 1);
+          continue;
+        }
+
+        if (p.group.position.z > 25) {
+          scene.remove(p.group);
+          pickups.splice(i, 1);
+        }
+      }
+
+      // Speed rain
+      if (speedParticles) {
+        const pPos = speedParticles.geometry.attributes.position;
+        const mv = (speed * 0.12 + 25) * dt;
+        for (let i = 0; i < pPos.count; i++) {
+          let pz = pPos.getZ(i) + mv;
+          if (pz > 20) {
+            pz = -300;
+            pPos.setX(i, (Math.random() - 0.5) * 60);
+          }
+          pPos.setZ(i, pz);
+        }
+        pPos.needsUpdate = true;
+      }
+
+      updateHUD();
     }
 
-    pos.needsUpdate=true;
-  }
+    function updateHUD() {
+      document.getElementById('hudSpeed').innerHTML = Math.floor(speed) + ' <span class="text-xs text-cyan-300 font-normal">KM/H</span>';
+      document.getElementById('hudScore').childNodes[0].nodeValue = Math.floor(score).toLocaleString() + ' ';
+      document.getElementById('hudDistance').textContent = Math.floor(distance).toLocaleString() + ' M';
+      document.getElementById('hudNitroText').textContent = Math.floor(nitro) + '%';
+      document.getElementById('hudNitroBar').style.width = Math.floor(nitro) + '%';
+      document.getElementById('hudShieldText').textContent = shields + ' / ' + maxShields;
 
+      const pills = document.getElementById('hudShieldPills');
+      pills.innerHTML = '';
+      for (let i = 0; i < maxShields; i++) {
+        const el = document.createElement('div');
+        el.className = 'flex-1 h-full rounded-full ' + (i < shields ? 'bg-blue-400 shadow-[0_0_8px_#3b82f6]' : 'bg-slate-800');
+        pills.appendChild(el);
+      }
 
-  /* stars */
+      document.getElementById('hudLevelText').textContent = 'LEVEL ' + level;
+      document.getElementById('hudXPText').textContent = Math.floor(xp) + ' / ' + xpNeeded + ' XP';
+      document.getElementById('hudXPBar').style.width = Math.min(100, (xp / xpNeeded) * 100) + '%';
 
-  if(starParticles){
+      const comboBadge = document.getElementById('hudCombo');
+      if (combo > 1) {
+        comboBadge.textContent = combo.toFixed(1) + 'x';
+        comboBadge.classList.remove('hidden');
+      } else {
+        comboBadge.classList.add('hidden');
+      }
 
-    starParticles.rotation.y+=
-      delta*.003;
-  }
-
-
-  /* sky traffic */
-
-  skyVehicles.forEach(v=>{
-
-    v.mesh.position.x+=
-      v.speed*
-      v.dir*
-      delta;
-
-    if(v.mesh.position.x>150){
-      v.dir=-1;
+      document.getElementById('hudPolice').classList.toggle('hidden', !policeActive);
+      document.getElementById('hudMissionText').textContent = 'Highway Run (' + Math.floor(distance) + 'm / 500m)';
     }
 
-    if(v.mesh.position.x<-150){
-      v.dir=1;
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      if (running && !paused) update(dt);
+      renderer.render(scene, camera);
     }
-  });
 
 
-  /* debris */
-
-  for(
-    let i=debrisList.length-1;
-    i>=0;
-    i--
-  ){
-
-    const d=debrisList[i];
-
-    d.mesh.position.addScaledVector(
-      d.vel,
-      delta
-    );
-
-    d.vel.y-=25*delta;
-
-    d.mesh.rotation.x+=delta*4;
-    d.mesh.rotation.y+=delta*5;
-
-    if(
-      d.mesh.position.y<.2
-    ){
-
-      d.mesh.position.y=.2;
-
-      d.vel.y=
-        -d.vel.y*.4;
+    /* =========================================================
+       GARAGE LOGIC
+       ========================================================= */
+    function openGarage() {
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('garageScreen').classList.remove('hidden');
+      updateGarageUI();
     }
-  }
 
+    function closeGarage() {
+      document.getElementById('garageScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+    }
 
-  renderer.render(
-    scene,
-    camera
-  );
-}
+    function updateGarageUI() {
+      const c = CARS[selectedCarIndex];
+      document.getElementById('garageCredits').textContent = credits.toLocaleString();
+      document.getElementById('garageCarName').textContent = c.name;
+      document.getElementById('garageCarClass').textContent = c.classType;
 
+      document.getElementById('statSpeed').textContent = c.topSpeed + ' KM/H';
+      document.getElementById('barSpeed').style.width = Math.min(100, (c.topSpeed / 330) * 100) + '%';
 
-/* ---------------- RESIZE ---------------- */
+      document.getElementById('statAccel').textContent = c.accel + '%';
+      document.getElementById('barAccel').style.width = c.accel + '%';
 
-function onResize(){
+      document.getElementById('statNitro').textContent = '+' + c.nitroBoost + ' KM/H';
+      document.getElementById('barNitro').style.width = Math.min(100, (c.nitroBoost / 150) * 100) + '%';
 
-  if(!camera||!renderer)return;
+      const btn = document.getElementById('garageActionBtn');
+      if (c.unlocked) {
+        btn.textContent = 'DEPLOY MACHINE';
+        btn.className = 'flex-1 py-3.5 rounded-2xl bg-cyan-400 text-slate-950 font-black font-cyber tracking-wider shadow-[0_0_30px_rgba(0,234,255,0.4)]';
+      } else {
+        btn.textContent = 'UNLOCK (' + c.price + ' SHARDS)';
+        btn.className = credits >= c.price
+          ? 'flex-1 py-3.5 rounded-2xl bg-amber-400 text-black font-black font-cyber tracking-wider shadow-[0_0_30px_rgba(255,170,0,0.5)]'
+          : 'flex-1 py-3.5 rounded-2xl bg-slate-800 text-slate-500 font-cyber font-black cursor-not-allowed';
+      }
 
-  camera.aspect=
-    innerWidth/innerHeight;
+      document.getElementById('menuCarName').textContent = c.name;
+      document.getElementById('menuCarClass').textContent = c.classType;
 
-  camera.updateProjectionMatrix();
+      buildPlayerCar();
+    }
 
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-}
+    function prevCar() {
+      selectedCarIndex = selectedCarIndex > 0 ? selectedCarIndex - 1 : CARS.length - 1;
+      localStorage.setItem('np_car_idx', selectedCarIndex);
+      updateGarageUI();
+    }
 
+    function nextCar() {
+      selectedCarIndex = selectedCarIndex < CARS.length - 1 ? selectedCarIndex + 1 : 0;
+      localStorage.setItem('np_car_idx', selectedCarIndex);
+      updateGarageUI();
+    }
 
-/* ---------------- START ---------------- */
+    function setUnderglow(col) {
+      CARS[selectedCarIndex].underglow = col;
+      buildPlayerCar();
+    }
 
-window.addEventListener(
-  "DOMContentLoaded",
-  init
-);
-</script>
+    function garageAction() {
+      const c = CARS[selectedCarIndex];
+      if (c.unlocked) {
+        closeGarage();
+      } else if (credits >= c.price) {
+        credits -= c.price;
+        c.unlocked = true;
+        localStorage.setItem('np_credits', credits);
+        localStorage.setItem('np_unlocked', JSON.stringify(CARS.map(x => x.unlocked)));
+        sound.playPickup('credit');
+        updateGarageUI();
+      }
+    }
 
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
-        </html>
+            </html>
